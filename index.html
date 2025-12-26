@@ -242,7 +242,7 @@
 
         .piece.dragging {
             cursor: grabbing;
-            opacity: 0.9;
+            opacity: 0.4;
             z-index: 1000;
             filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
             /* Scale up to match grid cell size */
@@ -1008,18 +1008,26 @@
                 playSnapSound(); // Play feedback
                 hand[draggedPieceIndex] = null;
 
+                playSnapSound(); // Play feedback
+                hand[draggedPieceIndex] = null;
+
                 setTimeout(() => {
-                    checkAndClearLines();
-                    if (hand.every(p => p === null)) {
-                        generateNewHand();
-                    } else {
-                        const newPiece = generateRandomPiece();
-                        hand[draggedPieceIndex] = newPiece;
-                        rerenderHand();
-                    }
-                    setTimeout(() => {
-                        if (isGameOver()) showGameOver();
-                    }, 100);
+                    checkAndClearLines(() => {
+                        // Logic runs AFTER lines are confirmed cleared (or not)
+                        if (hand.every(p => p === null)) {
+                            generateNewHand();
+                        } else {
+                            const newPiece = generateRandomPiece();
+                            hand[draggedPieceIndex] = newPiece;
+                            rerenderHand();
+                        }
+
+                        // Game over check follows hand regen (since we might have filled the board, 
+                        // even with cleared lines, or the new piece might be impossible - though our smart spawner prevents that mostly)
+                        setTimeout(() => {
+                            if (isGameOver()) showGameOver();
+                        }, 50);
+                    });
                 }, 50);
             }
 
@@ -1112,6 +1120,10 @@
         // GAME LOGIC
         // ============================================
 
+        // ============================================
+        // GAME LOGIC
+        // ============================================
+
         function canPlacePiece(piece, startRow, startCol) {
             if (!piece) return false;
 
@@ -1149,7 +1161,7 @@
             addScore(piece.cells.length);
         }
 
-        function checkAndClearLines() {
+        function checkAndClearLines(onComplete) {
             const rowsToClear = [];
             const colsToClear = [];
 
@@ -1175,6 +1187,7 @@
             }
 
             if (rowsToClear.length === 0 && colsToClear.length === 0) {
+                if (onComplete) onComplete();
                 return;
             }
 
@@ -1231,6 +1244,9 @@
                 });
 
                 addScore(totalLineScore);
+
+                // Signal completion
+                if (onComplete) onComplete();
             }, 400);
         }
 
@@ -1260,19 +1276,26 @@
         // ============================================
 
         function isGameOver() {
+            console.log("--- Checking Game Over Condition ---");
             // Check if any piece in hand can fit anywhere on the grid
             for (const piece of hand) {
                 if (!piece) continue;
+                console.log(`Checking Piece: ${piece.name || 'Custom'}`);
 
                 for (let row = 0; row < GRID_SIZE; row++) {
                     for (let col = 0; col < GRID_SIZE; col++) {
-                        if (canPlacePiece(piece, row, col)) {
+                        const fits = canPlacePiece(piece, row, col);
+                        // Logging as requested (may be verbose)
+                        // console.log(`Checking Block at Position [${row},${col}] - Result: ${fits ? "Fit" : "No Fit"}`);
+
+                        if (fits) {
+                            console.log(`Found valid move for piece at ${row}, ${col}`);
                             return false;
                         }
                     }
                 }
             }
-
+            console.log("No valid moves found for any piece. Game Over.");
             return true;
         }
 
