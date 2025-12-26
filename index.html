@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Blast - Puzzle Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            user-select: none;
+            color: #e2e8f0;
+        }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .play-area {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            gap: 25px;
+        }
+
+        .header {
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
+            margin-bottom: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .score-display {
+            font-size: 1.4rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        .score-value {
+            color: #818cf8;
+            font-weight: 800;
+            font-size: 1.6rem;
+            text-shadow: 0 0 15px rgba(129, 140, 248, 0.4);
+        }
+
+        .grid-container {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 20px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 42px);
+            grid-template-rows: repeat(8, 42px);
+            gap: 6px;
+            background: #0f172a;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .cell {
+            width: 42px;
+            height: 42px;
+            background: #334155;
+            border-radius: 8px;
+            transition: all 0.15s ease;
+            position: relative;
+            box-shadow:
+                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .cell.filled {
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .cell.preview {
+            opacity: 0.6;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+            filter: grayscale(40%);
+            z-index: 10;
+            animation: previewPulse 1.5s infinite ease-in-out;
+            box-shadow: none !important;
+            /* Override standard shadows */
+        }
+
+        @keyframes previewPulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.5;
+            }
+
+            50% {
+                transform: scale(1.0);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(0.95);
+                opacity: 0.5;
+            }
+        }
+
+        .cell.invalid-preview {
+            background: rgba(248, 113, 113, 0.2) !important;
+            box-shadow:
+                inset 0 0 10px rgba(248, 113, 113, 0.2),
+                0 0 8px rgba(248, 113, 113, 0.1);
+        }
+
+        .cell.clearing {
+            animation: clearLine 0.4s ease-out forwards;
+        }
+
+        @keyframes clearLine {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+                filter: brightness(1.5);
+            }
+
+            50% {
+                transform: scale(1.1);
+                background: white !important;
+                box-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+            }
+
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Block Colors - Adjusted for Dark Mode vibrancy */
+        .color-coral {
+            background: linear-gradient(135deg, #ff6b6b, #ee5253) !important;
+        }
+
+        .color-mint {
+            background: linear-gradient(135deg, #48dbfb, #0abde3) !important;
+        }
+
+        /* Actually Cyan-ish for better contrast */
+        .color-sky {
+            background: linear-gradient(135deg, #54a0ff, #2e86de) !important;
+        }
+
+        .color-lavender {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7) !important;
+        }
+
+        .color-peach {
+            background: linear-gradient(135deg, #feca57, #ff9f43) !important;
+        }
+
+        .color-rose {
+            background: linear-gradient(135deg, #ff9ff3, #f368e0) !important;
+        }
+
+        .color-teal {
+            background: linear-gradient(135deg, #1dd1a1, #10ac84) !important;
+        }
+
+        .hand-container {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            padding: 20px 15px;
+            border-radius: 20px;
+            box-shadow:
+                0 15px 45px rgba(0, 0, 0, 0.3),
+                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 3px solid rgba(129, 140, 248, 0.3);
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+        }
+
+        .hand {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            justify-content: center;
+            align-items: center;
+            min-height: 100%;
+        }
+
+        .piece-slot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 100px;
+            min-height: 100px;
+        }
+
+        .piece {
+            display: grid;
+            gap: 3px;
+            cursor: grab;
+            padding: 8px;
+            border-radius: 12px;
+            transition: transform 0.2s ease, filter 0.2s ease;
+            background: transparent;
+            /* Removed background for cleaner look in dark mode */
+        }
+
+        .piece:hover {
+            transform: scale(1.08);
+            filter: brightness(1.1);
+        }
+
+        .piece.dragging {
+            cursor: grabbing;
+            opacity: 0.9;
+            z-index: 1000;
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+            /* Scale up to match grid cell size */
+            gap: 6px;
+        }
+
+        .piece.sticky {
+            filter: drop-shadow(0 0 15px #a78bfa) drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5));
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1.1);
+            }
+
+            50% {
+                transform: scale(1.15);
+            }
+
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .piece.dragging .piece-cell {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+        }
+
+        .piece-cell {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            box-shadow:
+                0 3px 8px rgba(0, 0, 0, 0.2),
+                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+        }
+
+        .piece-cell.empty {
+            background: transparent !important;
+            box-shadow: none;
+        }
+
+        /* Game Over Overlay */
+        .game-over-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .game-over-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .game-over-modal {
+            background: #1e293b;
+            padding: 50px 60px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow:
+                0 30px 80px rgba(0, 0, 0, 0.6),
+                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .game-over-overlay.active .game-over-modal {
+            transform: scale(1);
+        }
+
+        .game-over-modal h2 {
+            font-size: 2.8rem;
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            font-weight: 800;
+            text-shadow: 0 4px 15px rgba(129, 140, 248, 0.3);
+        }
+
+        .game-over-modal .final-score {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        .game-over-modal .final-score span {
+            color: #818cf8;
+            font-weight: 800;
+            font-size: 2rem;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            color: white;
+            border: none;
+            padding: 16px 50px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(129, 140, 248, 0.3);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(129, 140, 248, 0.5);
+        }
+
+        .restart-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Score Pop Animation */
+        .score-pop {
+            position: fixed;
+            pointer-events: none;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #c084fc;
+            text-shadow: 0 2px 10px rgba(192, 132, 252, 0.5);
+            animation: scorePop 0.8s ease-out forwards;
+            z-index: 1500;
+        }
+
+        @keyframes scorePop {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) scale(1.4);
+            }
+        }
+
+        /* Combo indicator */
+        .combo-text {
+            font-size: 1.1rem;
+            color: #c084fc;
+            font-weight: 700;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            text-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
+        }
+
+        .combo-text.visible {
+            opacity: 1;
+            animation: comboPulse 0.5s ease;
+        }
+
+        /* Start Menu Overlay */
+        .start-menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .start-menu-modal {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            animation: float 3s infinite ease-in-out;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .start-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(129, 140, 248, 0.4);
+            letter-spacing: 4px;
+        }
+
+        .start-hint {
+            font-size: 1.2rem;
+            color: #94a3b8;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            border: none;
+            padding: 20px 60px;
+            font-size: 1.5rem;
+            font-weight: 800;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            animation: btnPulse 2s infinite;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(139, 92, 246, 0.7);
+        }
+
+        @keyframes btnPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            }
+
+            50% {
+                transform: scale(1.02);
+                box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>BLOCK BLAST</h1>
+            <div class="score-display">Score: <span class="score-value" id="score">0</span></div>
+            <div class="combo-text" id="combo-text"></div>
+        </div>
+
+        <div class="play-area">
+            <div class="grid-container">
+                <div class="grid" id="grid"></div>
+            </div>
+
+            <div class="hand-container">
+                <div class="hand" id="hand"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="game-over-overlay" id="game-over">
+        <div class="game-over-modal">
+            <h2>Game Over!</h2>
+            <div class="final-score">Final Score: <span id="final-score">0</span></div>
+            <button class="restart-btn" id="restart-btn">Play Again</button>
+        </div>
+    </div>
+
+    <div class="start-menu-overlay" id="start-menu">
+        <div class="start-menu-modal">
+            <h1 class="start-title">BLOCK BLAST</h1>
+            <p class="start-hint">Drag blocks to clear rows & columns!</p>
+            <button class="start-btn" id="start-btn">Start Game</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // BLOCK BLAST - Complete Game Implementation
+        // ============================================
+
+        const GRID_SIZE = 8;
+        const CELL_SIZE = 42;
+        const COLORS = ['coral', 'mint', 'sky', 'lavender', 'peach', 'rose', 'teal'];
+
+        // Tetris-style block shapes (relative coordinates)
+        const SHAPES = [
+            // Single block
+            { cells: [[0, 0]], name: 'single' },
+            // Horizontal lines
+            { cells: [[0, 0], [0, 1]], name: 'h2' },
+            { cells: [[0, 0], [0, 1], [0, 2]], name: 'h3' },
+            { cells: [[0, 0], [0, 1], [0, 2], [0, 3]], name: 'h4' },
+            { cells: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]], name: 'h5' },
+            // Vertical lines
+            { cells: [[0, 0], [1, 0]], name: 'v2' },
+            { cells: [[0, 0], [1, 0], [2, 0]], name: 'v3' },
+            { cells: [[0, 0], [1, 0], [2, 0], [3, 0]], name: 'v4' },
+            { cells: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]], name: 'v5' },
+            // L shapes
+            { cells: [[0, 0], [1, 0], [1, 1]], name: 'l1' },
+            { cells: [[0, 0], [0, 1], [1, 0]], name: 'l2' },
+            { cells: [[0, 0], [0, 1], [1, 1]], name: 'l3' },
+            { cells: [[0, 1], [1, 0], [1, 1]], name: 'l4' },
+            // Big L shapes
+            { cells: [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2]], name: 'bigL1' },
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [2, 0]], name: 'bigL2' },
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]], name: 'bigL3' },
+            { cells: [[0, 2], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'bigL4' },
+            // Square shapes
+            { cells: [[0, 0], [0, 1], [1, 0], [1, 1]], name: 'sq2' },
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'sq3' },
+            // T shapes
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 1]], name: 't1' },
+            { cells: [[0, 0], [1, 0], [2, 0], [1, 1]], name: 't2' },
+            { cells: [[0, 1], [1, 0], [1, 1], [1, 2]], name: 't3' },
+            { cells: [[0, 1], [1, 0], [1, 1], [2, 1]], name: 't4' },
+            // Z shapes
+            { cells: [[0, 0], [0, 1], [1, 1], [1, 2]], name: 'z1' },
+            { cells: [[0, 1], [0, 2], [1, 0], [1, 1]], name: 'z2' },
+        ];
+
+        // Game State
+        let grid = [];
+        let hand = [];
+        let score = 0;
+        let draggedPiece = null;
+        let draggedPieceIndex = -1;
+        let dragOffset = { x: 0, y: 0 };
+
+        // Audio Context
+        let audioCtx = null;
+
+        // DOM Elements
+        const gridEl = document.getElementById('grid');
+        const handEl = document.getElementById('hand');
+        const scoreEl = document.getElementById('score');
+        const gameOverEl = document.getElementById('game-over');
+        const finalScoreEl = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+        const comboTextEl = document.getElementById('combo-text');
+        const startMenuEl = document.getElementById('start-menu');
+        const startBtn = document.getElementById('start-btn');
+
+        // ============================================
+        // AUDIO SYSTEM
+        // ============================================
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSnapSound() {
+            if (!audioCtx) return;
+
+            const t = audioCtx.currentTime;
+
+            // Oscillator for the "snap"
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            // High frequency "click" / "pop"
+            // Start high, drop fast
+            osc.frequency.setValueAtTime(800, t);
+            osc.frequency.exponentialRampToValueAtTime(100, t + 0.05);
+
+            // Envelope (percussive)
+            gain.gain.setValueAtTime(0.3, t); // Moderate volume
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.05);
+
+            osc.type = 'triangle'; // Slightly sharper than sine
+            osc.start(t);
+            osc.stop(t + 0.06);
+        }
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+
+        function preInit() {
+            // Render empty grid for visuals behind menu
+            gridEl.innerHTML = '';
+            for (let row = 0; row < GRID_SIZE; row++) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    gridEl.appendChild(cell);
+                }
+            }
+            // Setup start button
+            startBtn.addEventListener('click', startGame);
+        }
+
+        function startGame() {
+            // Fade out menu
+            startMenuEl.style.transition = 'opacity 0.5s ease';
+            startMenuEl.style.opacity = '0';
+            setTimeout(() => {
+                startMenuEl.style.display = 'none';
+            }, 500);
+
+            initAudio(); // Initialize audio context on interact
+            initGame();
+        }
+
+        function initGame() {
+            // Clear grid state logic
+            grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(null));
+            score = 0;
+            scoreEl.textContent = '0';
+            gameOverEl.classList.remove('active');
+
+            // Reset grid visuals (clear filled classes)
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.className = 'cell';
+            });
+
+            // Generate initial hand
+            hand = [];
+            generateNewHand();
+
+            // Setup event listeners (only once)
+            // We need to ensure we don't duplicate listeners if restarting
+            // Actually setupEventListeners handles DOM events which are global.
+            // Better to attach them once in preInit, or remove them before adding.
+            // Simplified: Attach once in preInit? No, we need them active only when game starts?
+            // Drag listeners track document. It's fine to have them active, logic checks Hand state.
+            // But we'll call it here to be safe and ensure drag logic is ready.
+        }
+
+        // Move event listeners setup to global scope or preInit check to avoid dupes?
+        // Let's use a flag or just remove/add. 
+        // For simplicity in this single file, let's just make sure setupEventListeners is called once.
+        let eventsAttached = false;
+
+        function setupEventListeners() {
+            if (eventsAttached) return;
+            eventsAttached = true;
+
+            // Mouse events
+            document.addEventListener('mousedown', handleMouseDown);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+
+            // Touch events
+            document.addEventListener('touchstart', handleTouchStart, { passive: false });
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd);
+
+            // Restart button
+            restartBtn.addEventListener('click', initGame);
+        }
+
+        // ============================================
+
+        function generateNewHand() {
+            handEl.innerHTML = '';
+            hand = [];
+
+            for (let i = 0; i < 3; i++) {
+                const piece = generateRandomPiece();
+                hand.push(piece);
+                renderPiece(piece, i);
+            }
+        }
+
+        function generateRandomPiece() {
+            const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+            const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+            return { ...shape, color };
+        }
+
+        function renderPiece(piece, index) {
+            if (!piece) {
+                const slot = document.createElement('div');
+                slot.className = 'piece-slot';
+                slot.dataset.index = index;
+                handEl.appendChild(slot);
+                return;
+            }
+
+            const slot = document.createElement('div');
+            slot.className = 'piece-slot';
+            slot.dataset.index = index;
+
+            // Calculate piece dimensions
+            let maxRow = 0, maxCol = 0;
+            piece.cells.forEach(([r, c]) => {
+                maxRow = Math.max(maxRow, r);
+                maxCol = Math.max(maxCol, c);
+            });
+
+            const pieceEl = document.createElement('div');
+            pieceEl.className = 'piece';
+            pieceEl.dataset.index = index;
+            pieceEl.style.gridTemplateColumns = `repeat(${maxCol + 1}, 28px)`;
+            pieceEl.style.gridTemplateRows = `repeat(${maxRow + 1}, 28px)`;
+
+            // Create cell grid for piece
+            for (let r = 0; r <= maxRow; r++) {
+                for (let c = 0; c <= maxCol; c++) {
+                    const cell = document.createElement('div');
+                    const isFilled = piece.cells.some(([pr, pc]) => pr === r && pc === c);
+                    cell.className = `piece-cell ${isFilled ? `color-${piece.color}` : 'empty'}`;
+                    pieceEl.appendChild(cell);
+                }
+            }
+
+            slot.appendChild(pieceEl);
+            handEl.appendChild(slot);
+        }
+
+        // ============================================
+        // DRAG AND DROP - Centered Dragging & Sticky Click
+        // ============================================
+
+        let draggedPieceWidth = 0;
+        let draggedPieceHeight = 0;
+        let pieceCenterRow = 0;
+        let pieceCenterCol = 0;
+
+        // Sticky State
+        let isSticky = false;
+        let dragStartX = 0;
+        let dragStartY = 0;
+        const DRAG_THRESHOLD = 5; // pixels
+
+        function setupEventListeners() {
+            // Mouse events
+            document.addEventListener('mousedown', handleMouseDown);
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+
+            // Touch events
+            document.addEventListener('touchstart', handleTouchStart, { passive: false });
+            document.addEventListener('touchmove', handleTouchMove, { passive: false });
+            document.addEventListener('touchend', handleTouchEnd);
+
+            // Restart button
+            restartBtn.addEventListener('click', initGame);
+        }
+
+        function handleMouseDown(e) {
+            // If already sticky, this click acts as the "Place" action
+            if (isSticky && draggedPiece) {
+                finishDrag(e.clientX, e.clientY);
+                return;
+            }
+
+            const pieceEl = e.target.closest('.piece');
+            if (!pieceEl) return;
+
+            const index = parseInt(pieceEl.dataset.index);
+            if (!hand[index]) return;
+
+            startDragLogic(pieceEl, index, e.clientX, e.clientY);
+
+            // Record start pos to distinguish click vs drag
+            dragStartX = e.clientX;
+            dragStartY = e.clientY;
+        }
+
+        function handleMouseMove(e) {
+            if (!draggedPiece) return;
+
+            // If not sticky yet, we are in "potential drag" or "dragging" state
+            // Logic is same: visual follows cursor
+            updatePiecePosition(e.clientX, e.clientY);
+            updatePreview(e.clientX, e.clientY);
+        }
+
+        function handleMouseUp(e) {
+            if (!draggedPiece) return;
+
+            // If we are in Sticky Mode, a mouse up does NOTHING (waiting for second click)
+            if (isSticky) return;
+
+            // If NOT sticky, check if this was a click or a drag
+            const dist = Math.hypot(e.clientX - dragStartX, e.clientY - dragStartY);
+
+            if (dist < DRAG_THRESHOLD) {
+                // It was a CLICK -> Enable Sticky Mode
+                isSticky = true;
+                draggedPiece.classList.add('sticky');
+            } else {
+                // It was a DRAG -> Finish Logic (Drop)
+                finishDrag(e.clientX, e.clientY);
+            }
+        }
+
+        function startDragLogic(pieceEl, index, startX, startY) {
+            draggedPiece = pieceEl;
+            draggedPieceIndex = index;
+            isSticky = false;
+
+            // Add dragging class
+            pieceEl.classList.add('dragging');
+            pieceEl.style.position = 'fixed';
+            pieceEl.style.pointerEvents = 'none';
+
+            // Calculate dimensions and center
+            const piece = hand[index];
+            let maxRow = 0, maxCol = 0;
+            piece.cells.forEach(([r, c]) => {
+                maxRow = Math.max(maxRow, r);
+                maxCol = Math.max(maxCol, c);
+            });
+
+            pieceCenterRow = Math.floor(maxRow / 2);
+            pieceCenterCol = Math.floor(maxCol / 2);
+
+            const DRAG_CELL_SIZE = 42;
+            const DRAG_GAP = 6;
+            const DRAG_PADDING = 8;
+            draggedPieceWidth = (maxCol + 1) * DRAG_CELL_SIZE + maxCol * DRAG_GAP + DRAG_PADDING * 2;
+            draggedPieceHeight = (maxRow + 1) * DRAG_CELL_SIZE + maxRow * DRAG_GAP + DRAG_PADDING * 2;
+
+            updatePiecePosition(startX, startY);
+        }
+
+        // Touch logic remains mostly standard drag-and-drop for now as 'hover' isn't a thing on touch
+        // preventing complexity with "tap to select" on mobile unless requested specifically.
+        // Keeping as-is (drag only) for touch to be safe, or just mapping start/move/end.
+        // User asked for "Click-to-Select" specifically implying mouse. I will leave touch as drag-only for valid UX.
+
+        function handleTouchStart(e) {
+            if (e.touches.length !== 1) return;
+            const touch = e.touches[0];
+            const pieceEl = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.piece');
+            if (!pieceEl) return;
+
+            // Normalize event-like object for common logic, but handling index extraction manually
+            const index = parseInt(pieceEl.dataset.index);
+            if (!hand[index]) return;
+
+            // Reuse start logic manually since event target differs
+            draggedPiece = pieceEl;
+            draggedPieceIndex = index;
+
+            pieceEl.classList.add('dragging');
+            pieceEl.style.position = 'fixed';
+            pieceEl.style.pointerEvents = 'none';
+            e.preventDefault();
+
+            const piece = hand[index];
+            let maxRow = 0, maxCol = 0;
+            piece.cells.forEach(([r, c]) => {
+                maxRow = Math.max(maxRow, r);
+                maxCol = Math.max(maxCol, c);
+            });
+
+            pieceCenterRow = Math.floor(maxRow / 2);
+            pieceCenterCol = Math.floor(maxCol / 2);
+
+            const DRAG_CELL_SIZE = 42;
+            const DRAG_GAP = 6;
+            const DRAG_PADDING = 8;
+            draggedPieceWidth = (maxCol + 1) * DRAG_CELL_SIZE + maxCol * DRAG_GAP + DRAG_PADDING * 2;
+            draggedPieceHeight = (maxRow + 1) * DRAG_CELL_SIZE + maxRow * DRAG_GAP + DRAG_PADDING * 2;
+
+            // Touch offset for visibility
+            updatePiecePosition(touch.clientX, touch.clientY - 60);
+        }
+
+        function handleTouchMove(e) {
+            if (!draggedPiece || e.touches.length !== 1) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            updatePiecePosition(touch.clientX, touch.clientY - 60);
+            updatePreview(touch.clientX, touch.clientY - 60);
+        }
+
+        function handleTouchEnd(e) {
+            if (!draggedPiece) return;
+            const touch = e.changedTouches[0];
+            finishDrag(touch.clientX, touch.clientY - 60);
+        }
+
+        function updatePiecePosition(x, y) {
+            draggedPiece.style.left = `${x - draggedPieceWidth / 2}px`;
+            draggedPiece.style.top = `${y - draggedPieceHeight / 2}px`;
+        }
+
+        function finishDrag(cursorX, cursorY) {
+            clearPreview();
+
+            const gridRect = gridEl.getBoundingClientRect();
+            const piece = hand[draggedPieceIndex];
+
+            // 1. Identify Grid Cell under Cursor
+            // Adding padding/gap compensation to ensure center of cell is hit
+            // Cell stride = 42 + 6 = 48
+            // Cursor relative to Grid Inner Content:
+            // TopLeft of Grid Content = gridRect.left + 8 (padding)
+
+            const relX = cursorX - (gridRect.left + 8);
+            const relY = cursorY - (gridRect.top + 8);
+
+            const cellStride = CELL_SIZE + 6; // 42 + 6 = 48
+
+            // Determine which cell the cursor is hovering
+            const cursorCol = Math.floor(relX / cellStride);
+            const cursorRow = Math.floor(relY / cellStride);
+
+            // 2. Adjust Start Position based on Piece Center
+            const startCol = cursorCol - pieceCenterCol;
+            const startRow = cursorRow - pieceCenterRow;
+
+            // Determine bounds for hit testing cursor
+            // We want strict cursor-over-grid behavior for validity?
+            // Actually, if the piece fits, we place it.
+            // The cursor might be slightly outside but piece inside? 
+            // Better to rely on canPlacePiece checking bounds.
+
+            if (canPlacePiece(piece, startRow, startCol)) {
+                placePiece(piece, startRow, startCol);
+                playSnapSound(); // Play feedback
+                hand[draggedPieceIndex] = null;
+
+                setTimeout(() => {
+                    checkAndClearLines();
+                    if (hand.every(p => p === null)) {
+                        generateNewHand();
+                    } else {
+                        const newPiece = generateRandomPiece();
+                        hand[draggedPieceIndex] = newPiece;
+                        rerenderHand();
+                    }
+                    setTimeout(() => {
+                        if (isGameOver()) showGameOver();
+                    }, 100);
+                }, 50);
+            }
+
+            resetDraggedPiece();
+        }
+
+        function resetDraggedPiece() {
+            if (draggedPiece) {
+                draggedPiece.classList.remove('dragging', 'sticky');
+                draggedPiece.style.position = '';
+                draggedPiece.style.left = '';
+                draggedPiece.style.top = '';
+                draggedPiece.style.pointerEvents = '';
+            }
+            draggedPiece = null;
+            draggedPieceIndex = -1;
+            draggedPieceWidth = 0;
+            draggedPieceHeight = 0;
+            isSticky = false;
+            rerenderHand();
+        }
+
+        function rerenderHand() {
+            handEl.innerHTML = '';
+            hand.forEach((piece, index) => renderPiece(piece, index));
+        }
+
+        // ============================================
+        // PREVIEW SYSTEM
+        // ============================================
+
+        function updatePreview(cursorX, cursorY) {
+            clearPreview();
+
+            if (draggedPieceIndex < 0 || !hand[draggedPieceIndex]) return;
+
+            const gridRect = gridEl.getBoundingClientRect();
+            const piece = hand[draggedPieceIndex];
+
+            // Same logic as drop
+            const relX = cursorX - (gridRect.left + 8);
+            const relY = cursorY - (gridRect.top + 8);
+            const cellStride = CELL_SIZE + 6;
+
+            const cursorCol = Math.floor(relX / cellStride);
+            const cursorRow = Math.floor(relY / cellStride);
+            const startCol = cursorCol - pieceCenterCol;
+            const startRow = cursorRow - pieceCenterRow;
+
+            // Only show preview if placement is valid
+            if (canPlacePiece(piece, startRow, startCol)) {
+                piece.cells.forEach(([r, c]) => {
+                    const targetRow = startRow + r;
+                    const targetCol = startCol + c;
+
+                    const cellEl = getCellElement(targetRow, targetCol);
+                    if (cellEl) {
+                        cellEl.classList.add('preview', `color-${piece.color}`);
+                    }
+                });
+            } else {
+                // Invalid placement logic (if needed)
+            }
+        }
+
+        function clearPreview() {
+            // Remove preview class and ALL color classes from potential preview cells
+            // We can't know exactly which color was added without tracking, 
+            // so we'll remove all known color classes just to be safe/simple, 
+            // OR just iterate grid and remove 'preview' and any color class IF the cell isn't 'filled'.
+            // Actually, 'filled' cells have color-X. A cell can't be filled AND preview.
+            // So we can safely strip color classes from any cell that has .preview before removing .preview.
+
+            document.querySelectorAll('.cell.preview').forEach(cell => {
+                cell.className = 'cell'; // Reset to base class (removes preview and color-X)
+                // Restore coord data that might have been lost? No, className assignment doesn't touch dataset.
+                // Re-add 'filled' if it was filled? 
+                // Wait, if we hover over a FILLED cell, it's invalid, so we don't show preview there (check canPlacePiece).
+                // So .preview only applies to empty cells.
+                // So resetting className to 'cell' is safe.
+            });
+
+            // Just in case we used invalid-preview
+            document.querySelectorAll('.cell.invalid-preview').forEach(cell => {
+                cell.classList.remove('invalid-preview');
+            });
+        }
+
+        // ============================================
+        // GAME LOGIC
+        // ============================================
+
+        function canPlacePiece(piece, startRow, startCol) {
+            if (!piece) return false;
+
+            for (const [r, c] of piece.cells) {
+                const row = startRow + r;
+                const col = startCol + c;
+
+                // Check bounds
+                if (row < 0 || row >= GRID_SIZE || col < 0 || col >= GRID_SIZE) {
+                    return false;
+                }
+
+                // Check overlap
+                if (grid[row][col] !== null) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function placePiece(piece, startRow, startCol) {
+            piece.cells.forEach(([r, c]) => {
+                const row = startRow + r;
+                const col = startCol + c;
+                grid[row][col] = piece.color;
+
+                const cellEl = getCellElement(row, col);
+                if (cellEl) {
+                    cellEl.classList.add('filled', `color-${piece.color}`);
+                }
+            });
+
+            // Add points for placing (1 point per cell)
+            addScore(piece.cells.length);
+        }
+
+        function checkAndClearLines() {
+            const rowsToClear = [];
+            const colsToClear = [];
+
+            // Check rows
+            for (let row = 0; row < GRID_SIZE; row++) {
+                if (grid[row].every(cell => cell !== null)) {
+                    rowsToClear.push(row);
+                }
+            }
+
+            // Check columns
+            for (let col = 0; col < GRID_SIZE; col++) {
+                let fullCol = true;
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    if (grid[row][col] === null) {
+                        fullCol = false;
+                        break;
+                    }
+                }
+                if (fullCol) {
+                    colsToClear.push(col);
+                }
+            }
+
+            if (rowsToClear.length === 0 && colsToClear.length === 0) {
+                return;
+            }
+
+            // Collect all cells to clear (avoid duplicates)
+            const cellsToClear = new Set();
+
+            rowsToClear.forEach(row => {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    cellsToClear.add(`${row},${col}`);
+                }
+            });
+
+            colsToClear.forEach(col => {
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    cellsToClear.add(`${row},${col}`);
+                }
+            });
+
+            // Calculate score
+            const linesCleared = rowsToClear.length + colsToClear.length;
+            const baseScore = cellsToClear.size * 10;
+            const comboBonus = linesCleared > 1 ? linesCleared * 50 : 0;
+            const totalLineScore = baseScore + comboBonus;
+
+            // Show combo text
+            if (linesCleared > 1) {
+                comboTextEl.textContent = `${linesCleared}x COMBO! +${comboBonus}`;
+                comboTextEl.classList.add('visible');
+                setTimeout(() => comboTextEl.classList.remove('visible'), 1500);
+            }
+
+            // Animate clearing
+            cellsToClear.forEach(key => {
+                const [row, col] = key.split(',').map(Number);
+                const cellEl = getCellElement(row, col);
+                if (cellEl) {
+                    cellEl.classList.add('clearing');
+                }
+            });
+
+            // Show score popup at grid center
+            showScorePopup(totalLineScore);
+
+            // Actually clear after animation
+            setTimeout(() => {
+                cellsToClear.forEach(key => {
+                    const [row, col] = key.split(',').map(Number);
+                    grid[row][col] = null;
+
+                    const cellEl = getCellElement(row, col);
+                    if (cellEl) {
+                        cellEl.className = 'cell';
+                    }
+                });
+
+                addScore(totalLineScore);
+            }, 400);
+        }
+
+        function getCellElement(row, col) {
+            return gridEl.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+        }
+
+        function addScore(points) {
+            score += points;
+            scoreEl.textContent = score;
+        }
+
+        function showScorePopup(points) {
+            const gridRect = gridEl.getBoundingClientRect();
+            const popup = document.createElement('div');
+            popup.className = 'score-pop';
+            popup.textContent = `+${points}`;
+            popup.style.left = `${gridRect.left + gridRect.width / 2}px`;
+            popup.style.top = `${gridRect.top + gridRect.height / 2}px`;
+            document.body.appendChild(popup);
+
+            setTimeout(() => popup.remove(), 800);
+        }
+
+        // ============================================
+        // GAME OVER CHECK
+        // ============================================
+
+        function isGameOver() {
+            // Check if any piece in hand can fit anywhere on the grid
+            for (const piece of hand) {
+                if (!piece) continue;
+
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        if (canPlacePiece(piece, row, col)) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        function showGameOver() {
+            finalScoreEl.textContent = score;
+            gameOverEl.classList.add('active');
+        }
+
+        // ============================================
+        // START GAME
+        // ============================================
+
+        preInit();
+        setupEventListeners(); // Attach inputs early so sticky/hover works if needed in future
+    </script>
+</body>
+
+</html>
