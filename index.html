@@ -584,41 +584,80 @@
         const COLORS = ['coral', 'mint', 'sky', 'lavender', 'peach', 'rose', 'teal'];
 
         // Tetris-style block shapes (relative coordinates)
-        const SHAPES = [
-            // Single block
+        // Tetris-style block shapes (relative coordinates)
+
+        // Categorized Sub-Pools for Smart Spawner & Difficulty Tiers
+        const SHAPES_SMALL = [
             { cells: [[0, 0]], name: 'single' },
-            // Horizontal lines
             { cells: [[0, 0], [0, 1]], name: 'h2' },
-            { cells: [[0, 0], [0, 1], [0, 2]], name: 'h3' },
-            { cells: [[0, 0], [0, 1], [0, 2], [0, 3]], name: 'h4' },
-            { cells: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]], name: 'h5' },
-            // Vertical lines
             { cells: [[0, 0], [1, 0]], name: 'v2' },
+            { cells: [[0, 0], [0, 1], [1, 0], [1, 1]], name: 'sq2' }
+        ];
+
+        const SHAPES_MEDIUM = [
+            { cells: [[0, 0], [0, 1], [0, 2]], name: 'h3' },
             { cells: [[0, 0], [1, 0], [2, 0]], name: 'v3' },
-            { cells: [[0, 0], [1, 0], [2, 0], [3, 0]], name: 'v4' },
-            { cells: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]], name: 'v5' },
-            // L shapes
             { cells: [[0, 0], [1, 0], [1, 1]], name: 'l1' },
             { cells: [[0, 0], [0, 1], [1, 0]], name: 'l2' },
             { cells: [[0, 0], [0, 1], [1, 1]], name: 'l3' },
             { cells: [[0, 1], [1, 0], [1, 1]], name: 'l4' },
-            // Big L shapes
-            { cells: [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2]], name: 'bigL1' },
-            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [2, 0]], name: 'bigL2' },
-            { cells: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]], name: 'bigL3' },
-            { cells: [[0, 2], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'bigL4' },
-            // Square shapes
-            { cells: [[0, 0], [0, 1], [1, 0], [1, 1]], name: 'sq2' },
-            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'sq3' },
-            // T shapes
             { cells: [[0, 0], [0, 1], [0, 2], [1, 1]], name: 't1' },
             { cells: [[0, 0], [1, 0], [2, 0], [1, 1]], name: 't2' },
             { cells: [[0, 1], [1, 0], [1, 1], [1, 2]], name: 't3' },
             { cells: [[0, 1], [1, 0], [1, 1], [2, 1]], name: 't4' },
-            // Z shapes
             { cells: [[0, 0], [0, 1], [1, 1], [1, 2]], name: 'z1' },
             { cells: [[0, 1], [0, 2], [1, 0], [1, 1]], name: 'z2' },
+            // New Awkward Shape
+            { cells: [[0, 0], [1, 1], [2, 2]], name: 'diagonal-3' },
+            // Standard 4-Block L-Shapes
+            { cells: [[0, 0], [1, 0], [2, 0], [2, 1]], name: 'l-stand' },
+            { cells: [[1, 0], [1, 1], [1, 2], [0, 2]], name: 'l-90' },
+            { cells: [[0, 0], [0, 1], [1, 1], [2, 1]], name: 'l-180' },
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 0]], name: 'l-270' }
         ];
+
+        const SHAPES_LARGE = [
+            { cells: [[0, 0], [0, 1], [0, 2], [0, 3]], name: 'h4' },
+            { cells: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]], name: 'h5' },
+            { cells: [[0, 0], [1, 0], [2, 0], [3, 0]], name: 'v4' },
+            { cells: [[0, 0], [1, 0], [2, 0], [3, 0], [4, 0]], name: 'v5' },
+            { cells: [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2]], name: 'bigL1' },
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [2, 0]], name: 'bigL2' },
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]], name: 'bigL3' },
+            { cells: [[0, 2], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'bigL4' },
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'sq3' },
+            // New High-Difficulty Shapes
+            { cells: [[0, 1], [1, 0], [1, 1], [1, 2], [2, 1]], name: 'plus' },
+            { cells: [[0, 0], [0, 2], [1, 1], [2, 0], [2, 2]], name: 'x-shape' },
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'hollow-sq' },
+            { cells: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1]], name: 'rect-3x2' }
+        ];
+
+        // Difficulty Specific Subsets
+        // Tier 1: Tutorial (0-500) - Easy bias
+        const POOL_EASY = [
+            ...SHAPES_SMALL,
+            { cells: [[0, 0], [0, 1], [0, 2]], name: 'h3' }, // Add H3
+            { cells: [[0, 0], [1, 0], [2, 0]], name: 'v3' }  // Add V3
+        ];
+
+        // Tier 2: Warm Up (500-1500) - Awkward shapes (Ts, Zs, Ls) + Mediums
+        const POOL_AWKWARD = SHAPES_MEDIUM.filter(s =>
+            ['t1', 't2', 't3', 't4', 'z1', 'z2', 'l1', 'l2', 'l3', 'l4', 'diagonal-3', 'l-stand', 'l-90', 'l-180', 'l-270'].includes(s.name)
+        );
+
+        // Tier 3: The Squeeze (1500-3000) - Long Bars mainly + some Mediums
+        const POOL_LONG = SHAPES_LARGE.filter(s => ['h4', 'h5', 'v4', 'v5'].includes(s.name));
+
+        // Tier 4: Boss (3000+) - Giant shapes
+        const POOL_BOSS = SHAPES_LARGE.filter(s =>
+            ['bigL1', 'bigL2', 'bigL3', 'bigL4', 'sq3',
+                'plus', 'x-shape', 'hollow-sq', 'rect-3x2'].includes(s.name)
+        );
+
+
+        // Master list for reference if needed, though we primarily use pools now
+        const SHAPES = [...SHAPES_SMALL, ...SHAPES_MEDIUM, ...SHAPES_LARGE];
 
         // Game State
         let grid = [];
@@ -763,23 +802,99 @@
         }
 
         // ============================================
+        // SMART SPAWNER SYSTEM
+        // ============================================
+
+        function getGridOccupancy() {
+            let filledCount = 0;
+            const totalCells = GRID_SIZE * GRID_SIZE;
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    if (grid[r][c] !== null) filledCount++;
+                }
+            }
+            return filledCount / totalCells;
+        }
+
+        // Check if a piece can fit ANYWHERE on the current grid
+        function canPieceFitAnywhere(piece) {
+            for (let r = 0; r < GRID_SIZE; r++) {
+                for (let c = 0; c < GRID_SIZE; c++) {
+                    if (canPlacePiece(piece, r, c)) return true;
+                }
+            }
+            return false;
+        }
+
+        function generateSmartHand() {
+            const occupancy = getGridOccupancy();
+            const newHand = [];
+
+            // 1. Determine Pool Strategy based on Occupancy
+            // Panic (>0.7): Small only
+            // Warning (>0.5): Small + Medium
+            // Safe (<0.5): All (Small + Medium + Large)
+
+            let possibleShapes;
+
+            if (occupancy > 0.70) {
+                // PANIC MODE
+                console.log("Spawner: Panic Mode (>70%)");
+                possibleShapes = SHAPES_SMALL;
+            } else if (occupancy > 0.50) {
+                // WARNING MODE
+                console.log("Spawner: Warning Mode (>50%)");
+                possibleShapes = [...SHAPES_SMALL, ...SHAPES_MEDIUM];
+            } else {
+                // SAFE MODE
+                console.log("Spawner: Safe Mode (<50%)");
+                possibleShapes = [...SHAPES_SMALL, ...SHAPES_MEDIUM, ...SHAPES_LARGE];
+            }
+
+            // 2. Draft 3 Pieces
+            for (let i = 0; i < 3; i++) {
+                const shape = possibleShapes[Math.floor(Math.random() * possibleShapes.length)];
+                newHand.push({
+                    ...shape,
+                    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                    id: Date.now() + i
+                });
+            }
+
+            // 3. Safety Valve
+            // Check if AT LEAST ONE piece in the hand fits.
+            const atLeastOneFits = newHand.some(piece => canPieceFitAnywhere(piece));
+
+            if (!atLeastOneFits) {
+                console.log("Spawner: Safety Valve Triggered (No pieces fit). Forcing 1x1.");
+                // Replace the last piece with a 1x1 Single
+                // (Index 2 is usually the rightmost piece)
+                const singleShape = SHAPES_SMALL.find(s => s.name === 'single') || SHAPES_SMALL[0];
+                newHand[2] = {
+                    ...singleShape,
+                    color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                    id: Date.now() + 999
+                };
+            }
+
+            return newHand;
+        }
 
         function generateNewHand() {
             handEl.innerHTML = '';
-            hand = [];
+            hand = generateSmartHand();
 
-            for (let i = 0; i < 3; i++) {
-                const piece = generateRandomPiece();
-                hand.push(piece);
-                renderPiece(piece, i);
-            }
+            hand.forEach((piece, index) => renderPiece(piece, index));
         }
 
+        /* 
         function generateRandomPiece() {
-            const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
-            const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-            return { ...shape, color };
+             // Deprecated in favor of block-hand generation, 
+             // but if we need a single piece fallback (e.g. detailed logic), keeping referenced:
+             const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+             return { ...shape, color: COLORS[Math.floor(Math.random() * COLORS.length)] };
         }
+        */
 
         function renderPiece(piece, index) {
             if (!piece) {
@@ -1037,13 +1152,18 @@
                         if (hand.every(p => p === null)) {
                             generateNewHand();
                         } else {
-                            const newPiece = generateRandomPiece();
-                            hand[draggedPieceIndex] = newPiece;
-                            rerenderHand();
+                            // If we have empty slots but hand is not fully empty (not standard Block Blast behavior but handled)
+                            // Standard Block Blast only regenerates when ALL 3 are used.
+                            // So we do nothing here usually.
+
+                            // If you want standard behavior: Do nothing.
+                            // If you want instant refill of single slot:
+                            // const newPiece = generateSmartPiece(); // We'd need to separate this logic.
+                            // hand[draggedPieceIndex] = newPiece;
+                            // rerenderHand();
                         }
 
-                        // Game over check follows hand regen (since we might have filled the board, 
-                        // even with cleared lines, or the new piece might be impossible - though our smart spawner prevents that mostly)
+                        // Game over check
                         setTimeout(() => {
                             if (isGameOver()) showGameOver();
                         }, 50);
