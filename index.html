@@ -140,6 +140,26 @@
                 0 0 8px rgba(248, 113, 113, 0.1);
         }
 
+        .cell.is-about-to-clear {
+            background: linear-gradient(135deg, #d1d5db, #c0c4c9) !important;
+            box-shadow:
+                0 0 6px rgba(209, 213, 219, 0.4),
+                inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
+            animation: whitePulse 0.6s infinite ease-in-out;
+        }
+
+        @keyframes whitePulse {
+
+            0%,
+            100% {
+                opacity: 0.85;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
         .cell.clearing {
             animation: clearLine 0.4s ease-out forwards;
         }
@@ -1079,6 +1099,7 @@
 
             // Only show preview if placement is valid
             if (canPlacePiece(piece, startRow, startCol)) {
+                // Show piece preview
                 piece.cells.forEach(([r, c]) => {
                     const targetRow = startRow + r;
                     const targetCol = startCol + c;
@@ -1088,26 +1109,91 @@
                         cellEl.classList.add('preview', `color-${piece.color}`);
                     }
                 });
+
+                // Check for potential line clears and highlight them
+                const potentialClears = getPotentialClears(piece, startRow, startCol);
+                applyLineClearPreview(potentialClears);
             } else {
                 // Invalid placement logic (if needed)
             }
         }
 
-        function clearPreview() {
-            // Remove preview class and ALL color classes from potential preview cells
-            // We can't know exactly which color was added without tracking, 
-            // so we'll remove all known color classes just to be safe/simple, 
-            // OR just iterate grid and remove 'preview' and any color class IF the cell isn't 'filled'.
-            // Actually, 'filled' cells have color-X. A cell can't be filled AND preview.
-            // So we can safely strip color classes from any cell that has .preview before removing .preview.
+        // Simulate placement on a grid copy and detect rows/columns that would clear
+        function getPotentialClears(piece, startRow, startCol) {
+            // Create shallow copy of grid state
+            const simulatedGrid = grid.map(row => [...row]);
 
+            // Simulate placing the piece
+            for (const [r, c] of piece.cells) {
+                const targetRow = startRow + r;
+                const targetCol = startCol + c;
+                if (targetRow >= 0 && targetRow < GRID_SIZE &&
+                    targetCol >= 0 && targetCol < GRID_SIZE) {
+                    simulatedGrid[targetRow][targetCol] = piece.color;
+                }
+            }
+
+            const rowsToClear = [];
+            const colsToClear = [];
+
+            // Check rows
+            for (let row = 0; row < GRID_SIZE; row++) {
+                if (simulatedGrid[row].every(cell => cell !== null)) {
+                    rowsToClear.push(row);
+                }
+            }
+
+            // Check columns
+            for (let col = 0; col < GRID_SIZE; col++) {
+                let fullCol = true;
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    if (simulatedGrid[row][col] === null) {
+                        fullCol = false;
+                        break;
+                    }
+                }
+                if (fullCol) {
+                    colsToClear.push(col);
+                }
+            }
+
+            return { rows: rowsToClear, cols: colsToClear };
+        }
+
+        // Apply the is-about-to-clear class to cells in rows/columns that would clear
+        function applyLineClearPreview(potentialClears) {
+            const { rows, cols } = potentialClears;
+
+            // Apply to rows
+            for (const row of rows) {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const cellEl = getCellElement(row, col);
+                    if (cellEl) {
+                        cellEl.classList.add('is-about-to-clear');
+                    }
+                }
+            }
+
+            // Apply to columns
+            for (const col of cols) {
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    const cellEl = getCellElement(row, col);
+                    if (cellEl) {
+                        cellEl.classList.add('is-about-to-clear');
+                    }
+                }
+            }
+        }
+
+        function clearPreview() {
+            // Remove preview class from cells and reset to base state
             document.querySelectorAll('.cell.preview').forEach(cell => {
-                cell.className = 'cell'; // Reset to base class (removes preview and color-X)
-                // Restore coord data that might have been lost? No, className assignment doesn't touch dataset.
-                // Re-add 'filled' if it was filled? 
-                // Wait, if we hover over a FILLED cell, it's invalid, so we don't show preview there (check canPlacePiece).
-                // So .preview only applies to empty cells.
-                // So resetting className to 'cell' is safe.
+                cell.className = 'cell';
+            });
+
+            // Remove line clear preview highlighting
+            document.querySelectorAll('.cell.is-about-to-clear').forEach(cell => {
+                cell.classList.remove('is-about-to-clear');
             });
 
             // Just in case we used invalid-preview
