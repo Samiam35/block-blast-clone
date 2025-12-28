@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Block Blast - Puzzle Game</title>
+    <!-- Google Fonts: Fredoka One for bubbly typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,8 +17,10 @@
         }
 
         body {
-            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            font-family: 'Fredoka', 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #1a0533 0%, #0d1b2a 50%, #1b263b 100%);
+            background-size: 400% 400%;
+            animation: breathingBackground 15s ease infinite;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -23,6 +29,20 @@
             padding: 20px;
             user-select: none;
             color: #e2e8f0;
+        }
+
+        @keyframes breathingBackground {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .game-container {
@@ -44,38 +64,164 @@
         }
 
         .header h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c94b9c 25%, #9b59b6 50%, #667eea 75%, #48dbfb 100%);
+            background-size: 200% 200%;
+            animation: logoGradient 4s ease infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 4px 12px rgba(129, 140, 248, 0.3);
-            margin-bottom: 10px;
-            font-weight: 800;
-            letter-spacing: 2px;
+            text-shadow: none;
+            margin-bottom: 12px;
+            letter-spacing: 4px;
+            filter: drop-shadow(0 4px 20px rgba(155, 89, 182, 0.6)) drop-shadow(0 8px 40px rgba(102, 126, 234, 0.4));
+        }
+
+        @keyframes logoGradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
         }
 
         .score-display {
-            font-size: 1.4rem;
-            color: #94a3b8;
-            font-weight: 600;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
         }
 
         .score-value {
-            color: #818cf8;
-            font-weight: 800;
-            font-size: 1.6rem;
-            text-shadow: 0 0 15px rgba(129, 140, 248, 0.4);
+            font-family: 'Fredoka', sans-serif;
+            color: #ffd93d;
+            font-weight: 700;
+            font-size: 1.8rem;
+            text-shadow: 0 0 20px rgba(255, 217, 61, 0.6), 0 0 40px rgba(255, 217, 61, 0.3);
+        }
+
+        /* Level Progression Bar */
+        .level-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+        }
+
+        .level-text {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 2px 10px rgba(139, 92, 246, 0.4);
+        }
+
+        .level-bar {
+            width: 200px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .level-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff 0%, #9b59b6 50%, #e91e63 100%);
+            background-size: 200% 100%;
+            border-radius: 50px;
+            transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5), 0 0 20px rgba(155, 89, 182, 0.3);
+            animation: levelBarShimmer 2s infinite linear;
+        }
+
+        @keyframes levelBarShimmer {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+
+        .level-bar-fill.level-up-flash {
+            animation: levelUpFlash 0.6s ease-out;
+        }
+
+        @keyframes levelUpFlash {
+            0% {
+                background: #fff;
+                box-shadow: 0 0 30px #fff, 0 0 60px rgba(255, 215, 0, 0.8);
+            }
+
+            100% {
+                background: linear-gradient(90deg, #00d4ff 0%, #9b59b6 50%, #e91e63 100%);
+                box-shadow: 0 0 10px rgba(0, 212, 255, 0.5), 0 0 20px rgba(155, 89, 182, 0.3);
+            }
+        }
+
+        /* Level Up Popup */
+        .level-up-popup {
+            position: fixed;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: #ffd700;
+            text-shadow: 0 4px 20px rgba(255, 215, 0, 0.8), 0 0 40px rgba(255, 215, 0, 0.5);
+            pointer-events: none;
+            z-index: 2500;
+            animation: levelUpBounce 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        @keyframes levelUpBounce {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+                opacity: 0;
+            }
+
+            30% {
+                transform: translate(-50%, -70%) scale(1.3) rotate(5deg);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translate(-50%, -80%) scale(0.95) rotate(-2deg);
+                opacity: 1;
+            }
+
+            70% {
+                transform: translate(-50%, -90%) scale(1.0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -120%) scale(1.0) rotate(0deg);
+                opacity: 0;
+            }
         }
 
         .grid-container {
-            background: #1e293b;
-            padding: 15px;
-            border-radius: 20px;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 18px;
+            border-radius: 24px;
             box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.4),
-                inset 0 1px 1px rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+                0 25px 80px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(139, 92, 246, 0.15),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
         }
 
         .grid {
@@ -83,27 +229,39 @@
             grid-template-columns: repeat(8, 42px);
             grid-template-rows: repeat(8, 42px);
             gap: 6px;
-            background: #0f172a;
-            padding: 8px;
-            border-radius: 12px;
-            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
+            background: rgba(15, 23, 42, 0.9);
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow:
+                inset 0 4px 12px rgba(0, 0, 0, 0.6),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
         }
 
+        /* Empty grid cells - "etched" deep slots */
         .cell {
             width: 42px;
             height: 42px;
-            background: #334155;
-            border-radius: 8px;
+            background: rgba(30, 41, 59, 0.6);
+            border-radius: 10px;
             transition: all 0.15s ease;
             position: relative;
             box-shadow:
-                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+                inset 0 3px 8px rgba(0, 0, 0, 0.5),
+                inset 0 -1px 2px rgba(255, 255, 255, 0.05),
+                0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
+        /* Filled cells - "Gummy/Jelly" 3D effect */
         .cell.filled {
+            border-radius: 10px;
             box-shadow:
-                0 4px 12px rgba(0, 0, 0, 0.4),
-                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+                /* Outer glow/depth */
+                0 4px 15px rgba(0, 0, 0, 0.4),
+                0 2px 6px rgba(0, 0, 0, 0.3),
+                /* Inner highlight (top-left) */
+                inset 3px 3px 6px rgba(255, 255, 255, 0.35),
+                /* Inner shadow (bottom-right) */
+                inset -2px -3px 6px rgba(0, 0, 0, 0.25);
         }
 
         .cell.preview {
@@ -141,40 +299,68 @@
         }
 
         .cell.is-about-to-clear {
-            background: linear-gradient(135deg, #d1d5db, #c0c4c9) !important;
+            background: linear-gradient(45deg,
+                    #00f260 0%,
+                    #0575E6 33%,
+                    #8E2DE2 66%,
+                    #FF512F 100%) !important;
+            background-size: 300% 300%;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.9) !important;
+            animation:
+                holographicFlow 1.5s ease-in-out infinite,
+                hueCycle 2s linear infinite;
             box-shadow:
-                0 0 6px rgba(209, 213, 219, 0.4),
-                inset 0 2px 4px rgba(255, 255, 255, 0.5) !important;
-            animation: whitePulse 0.6s infinite ease-in-out;
+                /* Massive outer glow */
+                0 0 20px rgba(255, 255, 255, 0.7),
+                0 0 40px rgba(0, 242, 96, 0.5),
+                0 0 60px rgba(142, 45, 226, 0.3),
+                /* Inner glass gloss */
+                inset 0 0 15px rgba(255, 255, 255, 0.9),
+                inset 0 -5px 10px rgba(255, 255, 255, 0.3) !important;
+            filter: saturate(1.3) brightness(0.825);
         }
 
-        @keyframes whitePulse {
-
-            0%,
-            100% {
-                opacity: 0.85;
+        @keyframes holographicFlow {
+            0% {
+                background-position: 0% 0%;
             }
 
             50% {
-                opacity: 1;
+                background-position: 100% 100%;
+            }
+
+            100% {
+                background-position: 0% 0%;
             }
         }
 
-        .cell.clearing {
-            animation: clearLine 0.4s ease-out forwards;
+        @keyframes hueCycle {
+            0% {
+                filter: hue-rotate(0deg) saturate(1.3) brightness(0.825);
+            }
+
+            100% {
+                filter: hue-rotate(360deg) saturate(1.3) brightness(0.825);
+            }
         }
 
-        @keyframes clearLine {
+        .cell.clearing,
+        .cell.pop-out {
+            animation: popOut 0.25s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes popOut {
             0% {
                 transform: scale(1);
                 opacity: 1;
-                filter: brightness(1.5);
             }
 
-            50% {
-                transform: scale(1.1);
-                background: white !important;
-                box-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+            40% {
+                transform: scale(1.2);
+                opacity: 1;
+                filter: brightness(1.5);
             }
 
             100% {
@@ -183,45 +369,55 @@
             }
         }
 
-        /* Block Colors - Adjusted for Dark Mode vibrancy */
+        /* Explosion Particles */
+        .explosion-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1500;
+            will-change: transform, opacity;
+        }
+
+        /* Block Colors - Gummy/Candy Vibrant Gradients */
         .color-coral {
-            background: linear-gradient(135deg, #ff6b6b, #ee5253) !important;
+            background: linear-gradient(145deg, #ff7b7b 0%, #ff5252 50%, #e53935 100%) !important;
         }
 
         .color-mint {
-            background: linear-gradient(135deg, #48dbfb, #0abde3) !important;
+            background: linear-gradient(145deg, #64f5d8 0%, #26d0ce 50%, #1a9c97 100%) !important;
         }
 
-        /* Actually Cyan-ish for better contrast */
         .color-sky {
-            background: linear-gradient(135deg, #54a0ff, #2e86de) !important;
+            background: linear-gradient(145deg, #74b9ff 0%, #3498db 50%, #2475b0 100%) !important;
         }
 
         .color-lavender {
-            background: linear-gradient(135deg, #a29bfe, #6c5ce7) !important;
+            background: linear-gradient(145deg, #b8a5ff 0%, #9b7ae7 50%, #7c4dff 100%) !important;
         }
 
         .color-peach {
-            background: linear-gradient(135deg, #feca57, #ff9f43) !important;
+            background: linear-gradient(145deg, #ffd97d 0%, #ffc048 50%, #f5a623 100%) !important;
         }
 
         .color-rose {
-            background: linear-gradient(135deg, #ff9ff3, #f368e0) !important;
+            background: linear-gradient(145deg, #ffb8e0 0%, #ff6eb4 50%, #e91e8c 100%) !important;
         }
 
         .color-teal {
-            background: linear-gradient(135deg, #1dd1a1, #10ac84) !important;
+            background: linear-gradient(145deg, #4aeaae 0%, #1dd1a1 50%, #0fb88c 100%) !important;
         }
 
+        /* Hand/Tray Container - Glassmorphism Sidebar */
         .hand-container {
-            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-            padding: 20px 15px;
-            border-radius: 20px;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 22px 18px;
+            border-radius: 24px;
             box-shadow:
-                0 15px 45px rgba(0, 0, 0, 0.3),
-                inset 0 1px 1px rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-left: 3px solid rgba(129, 140, 248, 0.3);
+                0 20px 60px rgba(0, 0, 0, 0.35),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-left: 3px solid rgba(139, 92, 246, 0.5);
             min-width: 140px;
             display: flex;
             align-items: center;
@@ -260,6 +456,171 @@
             filter: brightness(1.1);
         }
 
+        /* Streak Popup - Elastic Bounce Animation */
+        .streak-popup {
+            position: absolute;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 700;
+            font-size: 2.5rem;
+            color: #ffd700;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+            pointer-events: none;
+            z-index: 2000;
+            animation: elasticBounce 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        @keyframes elasticBounce {
+            0% {
+                transform: translate(-50%, -50%) scale(0) rotate(-15deg);
+                opacity: 0;
+            }
+
+            30% {
+                transform: translate(-50%, -80%) scale(1.4) rotate(5deg);
+                opacity: 1;
+            }
+
+            50% {
+                transform: translate(-50%, -90%) scale(0.9) rotate(-3deg);
+                opacity: 1;
+            }
+
+            70% {
+                transform: translate(-50%, -100%) scale(1.0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(-50%, -150%) scale(1.0) rotate(0deg);
+                opacity: 0;
+            }
+        }
+
+        /* Screen Shake - Streak Celebration */
+        .shake-small {
+            animation: shake 0.3s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        .shake-medium {
+            animation: shake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        .shake-large {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        /* Hurt Shake - Invalid Drop Feedback */
+        .hurt-shake {
+            animation: hurtShake 0.4s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes hurtShake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            10%,
+            90% {
+                transform: translateX(-2px);
+            }
+
+            20%,
+            80% {
+                transform: translateX(4px);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translateX(-8px);
+            }
+
+            40%,
+            60% {
+                transform: translateX(8px);
+            }
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        /* Ambient Squish - Living Blocks */
+        .cell.squish {
+            animation: squish 0.3s ease-in-out;
+        }
+
+        @keyframes squish {
+            0% {
+                transform: scale(1.0);
+            }
+
+            50% {
+                transform: scale(1.05, 0.95);
+            }
+
+            100% {
+                transform: scale(1.0);
+            }
+        }
+
+        /* Idle Hint Ghost Preview */
+        .idle-hint-cell {
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            animation: idleHintPulse 1.5s ease-in-out forwards;
+        }
+
+        @keyframes idleHintPulse {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+
+            30% {
+                opacity: 0.5;
+                transform: scale(1.0);
+            }
+
+            70% {
+                opacity: 0.5;
+                transform: scale(1.0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+        }
+
+        /* Dragging */
         .piece.dragging {
             cursor: grabbing;
             opacity: 0.4;
@@ -291,16 +652,18 @@
         .piece.dragging .piece-cell {
             width: 42px;
             height: 42px;
-            border-radius: 8px;
+            border-radius: 10px;
         }
 
+        /* Piece cells in hand - Gummy 3D effect */
         .piece-cell {
             width: 28px;
             height: 28px;
-            border-radius: 6px;
+            border-radius: 8px;
             box-shadow:
-                0 3px 8px rgba(0, 0, 0, 0.2),
-                inset 0 2px 4px rgba(255, 255, 255, 0.2);
+                0 3px 10px rgba(0, 0, 0, 0.3),
+                inset 2px 2px 4px rgba(255, 255, 255, 0.3),
+                inset -1px -2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .piece-cell.empty {
@@ -308,66 +671,81 @@
             box-shadow: none;
         }
 
-        /* Game Over Overlay */
+        /* Game Over Overlay - Glassmorphism Entrance */
         .game-over-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(12px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 2000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.3s ease;
+            transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                backdrop-filter 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                visibility 0.4s;
         }
 
         .game-over-overlay.active {
             opacity: 1;
             visibility: visible;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .game-over-modal {
-            background: #1e293b;
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 50px 60px;
             border-radius: 30px;
             text-align: center;
             box-shadow:
-                0 30px 80px rgba(0, 0, 0, 0.6),
-                inset 0 1px 1px rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transform: scale(0.8);
-            transition: transform 0.3s ease;
+                0 30px 100px rgba(0, 0, 0, 0.7),
+                0 0 60px rgba(139, 92, 246, 0.2),
+                inset 0 1px 1px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .game-over-overlay.active .game-over-modal {
             transform: scale(1);
+            opacity: 1;
         }
 
         .game-over-modal h2 {
-            font-size: 2.8rem;
-            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            font-family: 'Fredoka', sans-serif;
+            font-size: 3rem;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c94b9c 50%, #667eea 100%);
+            background-size: 200% 200%;
+            animation: logoGradient 3s ease infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 15px;
-            font-weight: 800;
-            text-shadow: 0 4px 15px rgba(129, 140, 248, 0.3);
+            font-weight: 700;
+            filter: drop-shadow(0 4px 15px rgba(155, 89, 182, 0.5));
         }
 
         .game-over-modal .final-score {
-            font-size: 1.5rem;
-            color: #94a3b8;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.4rem;
+            color: rgba(255, 255, 255, 0.7);
             margin-bottom: 30px;
         }
 
         .game-over-modal .final-score span {
-            color: #818cf8;
-            font-weight: 800;
+            color: #ffd93d;
+            font-weight: 700;
             font-size: 2rem;
         }
 
@@ -544,6 +922,12 @@
         <div class="header">
             <h1>BLOCK BLAST</h1>
             <div class="score-display">Score: <span class="score-value" id="score">0</span></div>
+            <div class="level-container">
+                <span class="level-text" id="level-text">Level 1</span>
+                <div class="level-bar">
+                    <div class="level-bar-fill" id="level-bar-fill"></div>
+                </div>
+            </div>
             <div class="combo-text" id="combo-text"></div>
         </div>
 
@@ -581,6 +965,10 @@
 
         const GRID_SIZE = 8;
         const CELL_SIZE = 42;
+
+        // Level Progression
+        let currentLevel = 1;
+        const LEVEL_THRESHOLD = 1000; // Points per level
         const COLORS = ['coral', 'mint', 'sky', 'lavender', 'peach', 'rose', 'teal'];
 
         // Tetris-style block shapes (relative coordinates)
@@ -613,7 +1001,10 @@
             { cells: [[0, 0], [1, 0], [2, 0], [2, 1]], name: 'l-stand' },
             { cells: [[1, 0], [1, 1], [1, 2], [0, 2]], name: 'l-90' },
             { cells: [[0, 0], [0, 1], [1, 1], [2, 1]], name: 'l-180' },
-            { cells: [[0, 0], [0, 1], [0, 2], [1, 0]], name: 'l-270' }
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 0]], name: 'l-270' },
+            // New Satisfying Zig-Zags (Vertical)
+            { cells: [[0, 0], [1, 0], [1, 1], [2, 1]], name: 'zig-v1' },
+            { cells: [[0, 1], [1, 1], [1, 0], [2, 0]], name: 'zig-v2' }
         ];
 
         const SHAPES_LARGE = [
@@ -626,11 +1017,9 @@
             { cells: [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]], name: 'bigL3' },
             { cells: [[0, 2], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'bigL4' },
             { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'sq3' },
-            // New High-Difficulty Shapes
+            // New High-Difficulty/Satisfying Shapes
             { cells: [[0, 1], [1, 0], [1, 1], [1, 2], [2, 1]], name: 'plus' },
-            { cells: [[0, 0], [0, 2], [1, 1], [2, 0], [2, 2]], name: 'x-shape' },
-            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 2], [2, 0], [2, 1], [2, 2]], name: 'hollow-sq' },
-            { cells: [[0, 0], [0, 1], [1, 0], [1, 1], [2, 0], [2, 1]], name: 'rect-3x2' }
+            { cells: [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2]], name: 'rect-3x2' }
         ];
 
         // Difficulty Specific Subsets
@@ -643,7 +1032,7 @@
 
         // Tier 2: Warm Up (500-1500) - Awkward shapes (Ts, Zs, Ls) + Mediums
         const POOL_AWKWARD = SHAPES_MEDIUM.filter(s =>
-            ['t1', 't2', 't3', 't4', 'z1', 'z2', 'l1', 'l2', 'l3', 'l4', 'diagonal-3', 'l-stand', 'l-90', 'l-180', 'l-270'].includes(s.name)
+            ['t1', 't2', 't3', 't4', 'z1', 'z2', 'l1', 'l2', 'l3', 'l4', 'diagonal-3', 'l-stand', 'l-90', 'l-180', 'l-270', 'zig-v1', 'zig-v2'].includes(s.name)
         );
 
         // Tier 3: The Squeeze (1500-3000) - Long Bars mainly + some Mediums
@@ -652,9 +1041,14 @@
         // Tier 4: Boss (3000+) - Giant shapes
         const POOL_BOSS = SHAPES_LARGE.filter(s =>
             ['bigL1', 'bigL2', 'bigL3', 'bigL4', 'sq3',
-                'plus', 'x-shape', 'hollow-sq', 'rect-3x2'].includes(s.name)
+                'plus', 'rect-3x2'].includes(s.name)
         );
 
+        // Early Game Boost Pool (Multi-Line Clears)
+        // Vertical/Horizontal 3-Lines, 3x3 Squares, Vertical Zig-Zags
+        const POOL_TALL = SHAPES_SMALL.concat(SHAPES_MEDIUM).concat(SHAPES_LARGE).filter(s =>
+            ['v3', 'h3', 'sq3', 'zig-v1', 'zig-v2'].includes(s.name)
+        );
 
         // Master list for reference if needed, though we primarily use pools now
         const SHAPES = [...SHAPES_SMALL, ...SHAPES_MEDIUM, ...SHAPES_LARGE];
@@ -666,6 +1060,8 @@
         let draggedPiece = null;
         let draggedPieceIndex = -1;
         let dragOffset = { x: 0, y: 0 };
+        let comboStreak = 0; // State variable for streak system
+        let isAnimating = false; // Lock input during line clear animations
 
         // Audio Context
         let audioCtx = null;
@@ -682,7 +1078,7 @@
         const startBtn = document.getElementById('start-btn');
 
         // ============================================
-        // AUDIO SYSTEM
+        // SMART SPAWNER SYSTEM & DIFFICULTY
         // ============================================
 
         function initAudio() {
@@ -757,6 +1153,7 @@
             // Clear grid state logic
             grid = Array(GRID_SIZE).fill(null).map(() => Array(GRID_SIZE).fill(null));
             score = 0;
+            comboStreak = 0; // Reset streak
             scoreEl.textContent = '0';
             gameOverEl.classList.remove('active');
 
@@ -805,6 +1202,10 @@
         // SMART SPAWNER SYSTEM
         // ============================================
 
+        // ============================================
+        // SMART SPAWNER SYSTEM
+        // ============================================
+
         function getGridOccupancy() {
             let filledCount = 0;
             const totalCells = GRID_SIZE * GRID_SIZE;
@@ -826,64 +1227,158 @@
             return false;
         }
 
-        function generateSmartHand() {
-            const occupancy = getGridOccupancy();
-            const newHand = [];
+        // --- GAP HUNTER SYSTEM ---
 
-            // 1. Determine Pool Strategy based on Occupancy
-            // Panic (>0.7): Small only
-            // Warning (>0.5): Small + Medium
-            // Safe (<0.5): All (Small + Medium + Large)
+        // Scans the board for the easiest line to clear and returns the shape needed
+        function findWinningPiece() {
+            let bestCandidate = null;
+            let minHoles = Infinity;
 
-            let possibleShapes;
+            // Helper to check lines
+            const checkLine = (isRow, index) => {
+                let holes = [];
+                for (let i = 0; i < GRID_SIZE; i++) {
+                    const r = isRow ? index : i;
+                    const c = isRow ? i : index;
+                    if (grid[r][c] === null) {
+                        holes.push(isRow ? c : r); // Store the index of the hole
+                    }
+                }
+                return holes;
+            };
 
-            if (occupancy > 0.70) {
-                // PANIC MODE
+            // 1. Scan all Rows and Cols
+            for (let i = 0; i < GRID_SIZE; i++) {
+                // Check Row i
+                let rowHoles = checkLine(true, i);
+                // We look for lines that are ALMOST full (1 to 3 holes)
+                if (rowHoles.length > 0 && rowHoles.length <= 3) {
+                    if (isContiguous(rowHoles)) {
+                        if (rowHoles.length < minHoles) {
+                            minHoles = rowHoles.length;
+                            bestCandidate = findShapeByLength(rowHoles.length, true);
+                        }
+                    }
+                }
+
+                // Check Col i
+                let colHoles = checkLine(false, i);
+                if (colHoles.length > 0 && colHoles.length <= 3) {
+                    if (isContiguous(colHoles)) {
+                        if (colHoles.length < minHoles) {
+                            minHoles = colHoles.length;
+                            bestCandidate = findShapeByLength(colHoles.length, false);
+                        }
+                    }
+                }
+            }
+
+            return bestCandidate;
+        }
+
+        // Helper: Checks if numbers are neighbors (e.g. [3,4,5] is true, [1,4] is false)
+        function isContiguous(arr) {
+            if (arr.length <= 1) return true;
+            // Sorting to handle potential out-of-order hole detections (though unlikely with loop scan)
+            const sorted = [...arr].sort((a, b) => a - b);
+            for (let i = 0; i < sorted.length - 1; i++) {
+                if (sorted[i + 1] !== sorted[i] + 1) return false;
+            }
+            return true;
+        }
+
+        // Helper: Finds a shape in your library that matches a specific length and orientation
+        function findShapeByLength(length, isHorizontal) {
+            if (length === 1) return SHAPES.find(s => s.name === 'single');
+            if (length === 2) return SHAPES.find(s => s.name === (isHorizontal ? 'h2' : 'v2'));
+            if (length === 3) return SHAPES.find(s => s.name === (isHorizontal ? 'h3' : 'v3'));
+            return null;
+        }
+
+        // --- FORCE SATISFACTION SPAWNER ---
+        function generateSmartPiece(occupancy) {
+            let pool = [];
+            const currentScore = score;
+
+            // 1. EARLY GAME "HYPE MODE" (Score < 2000)
+            // We heavily dilute the pool with "Banger" pieces
+            if (currentScore < 2000 && occupancy < 0.6) {
+                console.log("Spawner: !!! HYPE MODE ACTIVE !!!");
+                // A. Add standard shapes once
+                pool = [...SHAPES];
+
+                // B. FORCE ADD "Tall & Big" shapes (Weighted heavily)
+                const hypeShapes = SHAPES.filter(s =>
+                    ['sq3', 'v3', 'v4', 'v5', 'zig-v1', 'zig-v2', 'rect-3x2'].includes(s.name)
+                );
+
+                for (let i = 0; i < 12; i++) {
+                    pool.push(...hypeShapes);
+                }
+            }
+            // 2. PANIC MODE (Board is messy/full)
+            // Ignore hype, save the player
+            else if (occupancy > 0.70) {
                 console.log("Spawner: Panic Mode (>70%)");
-                possibleShapes = SHAPES_SMALL;
-            } else if (occupancy > 0.50) {
-                // WARNING MODE
-                console.log("Spawner: Warning Mode (>50%)");
-                possibleShapes = [...SHAPES_SMALL, ...SHAPES_MEDIUM];
-            } else {
-                // SAFE MODE
-                console.log("Spawner: Safe Mode (<50%)");
-                possibleShapes = [...SHAPES_SMALL, ...SHAPES_MEDIUM, ...SHAPES_LARGE];
+                pool = SHAPES.filter(s => s.cells.length <= 3); // Only small stuff
+            }
+            // 3. NORMAL PLAY
+            else {
+                console.log("Spawner: Normal Mode");
+                pool = [...SHAPES];
             }
 
-            // 2. Draft 3 Pieces
+            // Pick from the manipulated pool
+            const shape = pool[Math.floor(Math.random() * pool.length)];
+            const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+
+            return {
+                ...shape,
+                color,
+                id: Date.now() + Math.random()
+            };
+        }
+
+        function generateNewHand() {
+            handEl.innerHTML = '';
+            hand = [];
+
+            const occupancy = getGridOccupancy();
+            const winningPiece = findWinningPiece(); // <--- Run the Gap Hunter
+
+            console.log(`Spawner: Score: ${score} - Occupancy: ${(occupancy * 100).toFixed(1)}%`);
+
+            // 1. Generate pieces
             for (let i = 0; i < 3; i++) {
-                const shape = possibleShapes[Math.floor(Math.random() * possibleShapes.length)];
-                newHand.push({
-                    ...shape,
-                    color: COLORS[Math.floor(Math.random() * COLORS.length)],
-                    id: Date.now() + i
-                });
+                // SLOT 0: The "Guarantee"
+                if (i === 0 && winningPiece) {
+                    console.log("Spawned Guaranteed Clear: " + winningPiece.name);
+                    hand.push({
+                        ...winningPiece,
+                        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+                        id: Date.now() + i
+                    });
+                }
+                // SLOT 1 & 2: Normal "Smart/Hype" Logic
+                else {
+                    hand.push(generateSmartPiece(occupancy));
+                }
             }
 
-            // 3. Safety Valve
-            // Check if AT LEAST ONE piece in the hand fits.
-            const atLeastOneFits = newHand.some(piece => canPieceFitAnywhere(piece));
+            // 2. SAFETY VALVE
+            const atLeastOneFits = hand.some(piece => canPieceFitAnywhere(piece));
 
             if (!atLeastOneFits) {
                 console.log("Spawner: Safety Valve Triggered (No pieces fit). Forcing 1x1.");
-                // Replace the last piece with a 1x1 Single
-                // (Index 2 is usually the rightmost piece)
                 const singleShape = SHAPES_SMALL.find(s => s.name === 'single') || SHAPES_SMALL[0];
-                newHand[2] = {
+                hand[2] = {
                     ...singleShape,
                     color: COLORS[Math.floor(Math.random() * COLORS.length)],
                     id: Date.now() + 999
                 };
             }
 
-            return newHand;
-        }
-
-        function generateNewHand() {
-            handEl.innerHTML = '';
-            hand = generateSmartHand();
-
+            // 3. Render
             hand.forEach((piece, index) => renderPiece(piece, index));
         }
 
@@ -944,6 +1439,7 @@
         let draggedPieceHeight = 0;
         let pieceCenterRow = 0;
         let pieceCenterCol = 0;
+        let dragSourceSlot = null; // Portal dragging: store original parent
 
         // Sticky State
         let isSticky = false;
@@ -967,6 +1463,9 @@
         }
 
         function handleMouseDown(e) {
+            // Lock input during line clear animation
+            if (isAnimating) return;
+
             // If already sticky, this click acts as the "Place" action
             if (isSticky && draggedPiece) {
                 finishDrag(e.clientX, e.clientY);
@@ -1019,10 +1518,18 @@
             draggedPieceIndex = index;
             isSticky = false;
 
-            // Add dragging class
+            // Portal Dragging: Store original parent and move to body
+            dragSourceSlot = pieceEl.parentElement;
+            document.body.appendChild(pieceEl);
+
+            // Add dragging class and ensure proper positioning
             pieceEl.classList.add('dragging');
             pieceEl.style.position = 'fixed';
+            pieceEl.style.zIndex = '9999';
             pieceEl.style.pointerEvents = 'none';
+
+            // Haptic feedback - short tick on pickup
+            triggerHaptic(10);
 
             // Calculate dimensions and center
             const piece = hand[index];
@@ -1050,23 +1557,30 @@
         // User asked for "Click-to-Select" specifically implying mouse. I will leave touch as drag-only for valid UX.
 
         function handleTouchStart(e) {
+            // Lock input during line clear animation
+            if (isAnimating) return;
+
             if (e.touches.length !== 1) return;
             const touch = e.touches[0];
             const pieceEl = document.elementFromPoint(touch.clientX, touch.clientY)?.closest('.piece');
             if (!pieceEl) return;
 
-            // Normalize event-like object for common logic, but handling index extraction manually
             const index = parseInt(pieceEl.dataset.index);
             if (!hand[index]) return;
 
-            // Reuse start logic manually since event target differs
+            // Setup drag state
             draggedPiece = pieceEl;
             draggedPieceIndex = index;
+            e.preventDefault();
+
+            // Portal Dragging: Store original parent and move to body
+            dragSourceSlot = pieceEl.parentElement;
+            document.body.appendChild(pieceEl);
 
             pieceEl.classList.add('dragging');
             pieceEl.style.position = 'fixed';
+            pieceEl.style.zIndex = '9999';
             pieceEl.style.pointerEvents = 'none';
-            e.preventDefault();
 
             const piece = hand[index];
             let maxRow = 0, maxCol = 0;
@@ -1110,82 +1624,81 @@
         function finishDrag(cursorX, cursorY) {
             clearPreview();
 
-            const gridRect = gridEl.getBoundingClientRect();
             const piece = hand[draggedPieceIndex];
+            if (!piece) {
+                resetDraggedPiece();
+                return;
+            }
 
-            // 1. Identify Grid Cell under Cursor
-            // Adding padding/gap compensation to ensure center of cell is hit
-            // Cell stride = 42 + 6 = 48
-            // Cursor relative to Grid Inner Content:
-            // TopLeft of Grid Content = gridRect.left + 8 (padding)
+            // Use snapped position if available, otherwise find one
+            let startRow = lastSnappedRow;
+            let startCol = lastSnappedCol;
 
-            const relX = cursorX - (gridRect.left + 8);
-            const relY = cursorY - (gridRect.top + 8);
+            if (startRow === null || startCol === null) {
+                const snapResult = findBestSnapPosition(cursorX, cursorY, piece);
+                if (snapResult) {
+                    startRow = snapResult.startRow;
+                    startCol = snapResult.startCol;
+                }
+            }
 
-            const cellStride = CELL_SIZE + 6; // 42 + 6 = 48
-
-            // Determine which cell the cursor is hovering
-            const cursorCol = Math.floor(relX / cellStride);
-            const cursorRow = Math.floor(relY / cellStride);
-
-            // 2. Adjust Start Position based on Piece Center
-            const startCol = cursorCol - pieceCenterCol;
-            const startRow = cursorRow - pieceCenterRow;
-
-            // Determine bounds for hit testing cursor
-            // We want strict cursor-over-grid behavior for validity?
-            // Actually, if the piece fits, we place it.
-            // The cursor might be slightly outside but piece inside? 
-            // Better to rely on canPlacePiece checking bounds.
-
-            if (canPlacePiece(piece, startRow, startCol)) {
+            // Place piece if valid position found
+            if (startRow !== null && startCol !== null && canPlacePiece(piece, startRow, startCol)) {
                 placePiece(piece, startRow, startCol);
-                playSnapSound(); // Play feedback
+                if (typeof playSnapSound === 'function') playSnapSound();
                 hand[draggedPieceIndex] = null;
 
-                playSnapSound(); // Play feedback
-                hand[draggedPieceIndex] = null;
+                // Portal Dragging: Remove the floating element since piece is now on grid
+                draggedPiece.remove();
+
+                // Haptic feedback - heavy thud on successful drop
+                triggerHaptic(25);
 
                 setTimeout(() => {
                     checkAndClearLines(() => {
-                        // Logic runs AFTER lines are confirmed cleared (or not)
                         if (hand.every(p => p === null)) {
                             generateNewHand();
-                        } else {
-                            // If we have empty slots but hand is not fully empty (not standard Block Blast behavior but handled)
-                            // Standard Block Blast only regenerates when ALL 3 are used.
-                            // So we do nothing here usually.
-
-                            // If you want standard behavior: Do nothing.
-                            // If you want instant refill of single slot:
-                            // const newPiece = generateSmartPiece(); // We'd need to separate this logic.
-                            // hand[draggedPieceIndex] = newPiece;
-                            // rerenderHand();
                         }
-
-                        // Game over check
                         setTimeout(() => {
                             if (isGameOver()) showGameOver();
                         }, 50);
                     });
                 }, 50);
+            } else {
+                // Invalid drop - trigger hurt shake on grid
+                const gridContainer = document.querySelector('.grid-container');
+                gridContainer.classList.remove('hurt-shake');
+                void gridContainer.offsetWidth; // Trigger reflow
+                gridContainer.classList.add('hurt-shake');
+                setTimeout(() => gridContainer.classList.remove('hurt-shake'), 400);
             }
 
+            // Reset snap state
+            lastSnappedRow = null;
+            lastSnappedCol = null;
             resetDraggedPiece();
         }
 
         function resetDraggedPiece() {
             if (draggedPiece) {
+                // Portal Dragging: Return piece to original slot if not played
+                if (dragSourceSlot && hand[draggedPieceIndex] !== null) {
+                    dragSourceSlot.appendChild(draggedPiece);
+                }
+
+                // Reset all styles
                 draggedPiece.classList.remove('dragging', 'sticky');
                 draggedPiece.style.position = '';
                 draggedPiece.style.left = '';
                 draggedPiece.style.top = '';
+                draggedPiece.style.zIndex = '';
                 draggedPiece.style.pointerEvents = '';
             }
             draggedPiece = null;
             draggedPieceIndex = -1;
             draggedPieceWidth = 0;
             draggedPieceHeight = 0;
+            dragSourceSlot = null;
             isSticky = false;
             rerenderHand();
         }
@@ -1196,30 +1709,29 @@
         }
 
         // ============================================
-        // PREVIEW SYSTEM
+        // PREVIEW SYSTEM - Magnetic Snapping
         // ============================================
+
+        const SNAP_RADIUS = 45; // pixels - search radius for magnetic snapping
+        let lastSnappedRow = null;
+        let lastSnappedCol = null;
 
         function updatePreview(cursorX, cursorY) {
             clearPreview();
 
             if (draggedPieceIndex < 0 || !hand[draggedPieceIndex]) return;
 
-            const gridRect = gridEl.getBoundingClientRect();
             const piece = hand[draggedPieceIndex];
 
-            // Same logic as drop
-            const relX = cursorX - (gridRect.left + 8);
-            const relY = cursorY - (gridRect.top + 8);
-            const cellStride = CELL_SIZE + 6;
+            // Find best snap position within radius
+            const snapResult = findBestSnapPosition(cursorX, cursorY, piece);
 
-            const cursorCol = Math.floor(relX / cellStride);
-            const cursorRow = Math.floor(relY / cellStride);
-            const startCol = cursorCol - pieceCenterCol;
-            const startRow = cursorRow - pieceCenterRow;
+            if (snapResult) {
+                const { startRow, startCol } = snapResult;
+                lastSnappedRow = startRow;
+                lastSnappedCol = startCol;
 
-            // Only show preview if placement is valid
-            if (canPlacePiece(piece, startRow, startCol)) {
-                // Show piece preview
+                // Show piece preview at snapped position
                 piece.cells.forEach(([r, c]) => {
                     const targetRow = startRow + r;
                     const targetCol = startCol + c;
@@ -1234,8 +1746,74 @@
                 const potentialClears = getPotentialClears(piece, startRow, startCol);
                 applyLineClearPreview(potentialClears);
             } else {
-                // Invalid placement logic (if needed)
+                lastSnappedRow = null;
+                lastSnappedCol = null;
             }
+        }
+
+        // Find the closest valid placement position within SNAP_RADIUS
+        function findBestSnapPosition(cursorX, cursorY, piece) {
+            const gridRect = gridEl.getBoundingClientRect();
+            const cellStride = CELL_SIZE + 6; // 48px
+            const gridPadding = 8;
+
+            // Calculate cursor position relative to grid
+            const relX = cursorX - (gridRect.left + gridPadding);
+            const relY = cursorY - (gridRect.top + gridPadding);
+
+            // Current cell under cursor
+            const cursorCol = Math.floor(relX / cellStride);
+            const cursorRow = Math.floor(relY / cellStride);
+
+            // Calculate search range (cells within radius)
+            const cellRadius = Math.ceil(SNAP_RADIUS / cellStride) + 1;
+
+            let bestCandidate = null;
+            let bestDistance = Infinity;
+
+            // Search grid positions within radius
+            for (let rowOffset = -cellRadius; rowOffset <= cellRadius; rowOffset++) {
+                for (let colOffset = -cellRadius; colOffset <= cellRadius; colOffset++) {
+                    const testRow = cursorRow + rowOffset - pieceCenterRow;
+                    const testCol = cursorCol + colOffset - pieceCenterCol;
+
+                    // Skip if out of bounds
+                    if (testRow < -5 || testRow >= GRID_SIZE + 5 ||
+                        testCol < -5 || testCol >= GRID_SIZE + 5) continue;
+
+                    // Check if piece can be placed here
+                    if (!canPlacePiece(piece, testRow, testCol)) continue;
+
+                    // Calculate screen position of this placement's center
+                    const placementCenterX = gridRect.left + gridPadding +
+                        (testCol + pieceCenterCol + 0.5) * cellStride;
+                    const placementCenterY = gridRect.top + gridPadding +
+                        (testRow + pieceCenterRow + 0.5) * cellStride;
+
+                    // Calculate Euclidean distance from cursor
+                    const distance = Math.hypot(
+                        cursorX - placementCenterX,
+                        cursorY - placementCenterY
+                    );
+
+                    // Only consider positions within radius
+                    if (distance <= SNAP_RADIUS && distance < bestDistance) {
+                        bestDistance = distance;
+                        bestCandidate = { startRow: testRow, startCol: testCol, distance };
+                    }
+                }
+            }
+
+            // If no candidate within radius, try exact position
+            if (!bestCandidate) {
+                const exactRow = cursorRow - pieceCenterRow;
+                const exactCol = cursorCol - pieceCenterCol;
+                if (canPlacePiece(piece, exactRow, exactCol)) {
+                    bestCandidate = { startRow: exactRow, startCol: exactCol, distance: 0 };
+                }
+            }
+
+            return bestCandidate;
         }
 
         // Simulate placement on a grid copy and detect rows/columns that would clear
@@ -1393,30 +1971,35 @@
             }
 
             if (rowsToClear.length === 0 && colsToClear.length === 0) {
+                comboStreak = 0; // Reset streak if no lines cleared
                 if (onComplete) onComplete();
                 return;
             }
 
-            // Collect all cells to clear (avoid duplicates)
-            const cellsToClear = new Set();
+            // Streak Increment
+            comboStreak++;
 
-            rowsToClear.forEach(row => {
-                for (let col = 0; col < GRID_SIZE; col++) {
-                    cellsToClear.add(`${row},${col}`);
-                }
-            });
-
-            colsToClear.forEach(col => {
-                for (let row = 0; row < GRID_SIZE; row++) {
-                    cellsToClear.add(`${row},${col}`);
-                }
-            });
+            // Lock input during animation
+            isAnimating = true;
 
             // Calculate score
             const linesCleared = rowsToClear.length + colsToClear.length;
-            const baseScore = cellsToClear.size * 10;
+            const cellCount = rowsToClear.length * GRID_SIZE + colsToClear.length * GRID_SIZE;
+            // Subtract overlaps (cells that are in both a row and column)
+            const overlaps = rowsToClear.length * colsToClear.length;
+            const uniqueCells = cellCount - overlaps;
+            const baseScore = uniqueCells * 10;
             const comboBonus = linesCleared > 1 ? linesCleared * 50 : 0;
-            const totalLineScore = baseScore + comboBonus;
+
+            // Streak Multiplier
+            const streakMultiplier = 1 + (comboStreak * 0.1);
+            const totalLineScore = Math.floor((baseScore + comboBonus) * streakMultiplier);
+
+            // Trigger Visuals
+            if (comboStreak > 1) {
+                showStreakPopup(comboStreak);
+            }
+            triggerScreenShake(comboStreak);
 
             // Show combo text
             if (linesCleared > 1) {
@@ -1425,21 +2008,70 @@
                 setTimeout(() => comboTextEl.classList.remove('visible'), 1500);
             }
 
-            // Animate clearing
-            cellsToClear.forEach(key => {
-                const [row, col] = key.split(',').map(Number);
-                const cellEl = getCellElement(row, col);
-                if (cellEl) {
-                    cellEl.classList.add('clearing');
+            // Build ordered list of cells to animate
+            // Rows: Left to Right, Columns: Top to Bottom
+            const animationQueue = [];
+            const processedCells = new Set();
+
+            // Process rows first (Left → Right)
+            rowsToClear.forEach(row => {
+                for (let col = 0; col < GRID_SIZE; col++) {
+                    const key = `${row},${col}`;
+                    if (!processedCells.has(key)) {
+                        processedCells.add(key);
+                        animationQueue.push({ row, col });
+                    }
                 }
             });
 
-            // Show score popup at grid center
+            // Process columns (Top → Bottom)
+            colsToClear.forEach(col => {
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    const key = `${row},${col}`;
+                    if (!processedCells.has(key)) {
+                        processedCells.add(key);
+                        animationQueue.push({ row, col });
+                    }
+                }
+            });
+
+            // Show score popup
             showScorePopup(totalLineScore);
 
-            // Actually clear after animation
+            // Haptic feedback - rumble pattern on line clear
+            triggerHaptic([10, 50, 10, 50]);
+
+            // Staggered animation with 17ms delay between each cell
+            const STAGGER_DELAY = 17;
+            const ANIMATION_DURATION = 250;
+
+            animationQueue.forEach((cell, index) => {
+                setTimeout(() => {
+                    const cellEl = getCellElement(cell.row, cell.col);
+                    if (cellEl) {
+                        // Get cell position for explosion
+                        const rect = cellEl.getBoundingClientRect();
+                        const centerX = rect.left + rect.width / 2;
+                        const centerY = rect.top + rect.height / 2;
+
+                        // Extract color class from cell
+                        const colorClass = [...cellEl.classList].find(c => c.startsWith('color-')) || 'color-coral';
+
+                        // Trigger particle explosion
+                        createExplosion(centerX, centerY, colorClass);
+
+                        // Also apply pop-out for the cell itself
+                        cellEl.classList.add('pop-out');
+                    }
+                }, index * STAGGER_DELAY);
+            });
+
+            // Clear cells and unlock after all animations complete
+            const totalAnimationTime = animationQueue.length * STAGGER_DELAY + ANIMATION_DURATION;
+
             setTimeout(() => {
-                cellsToClear.forEach(key => {
+                // Actually clear the grid data and reset cell visuals
+                processedCells.forEach(key => {
                     const [row, col] = key.split(',').map(Number);
                     grid[row][col] = null;
 
@@ -1451,9 +2083,12 @@
 
                 addScore(totalLineScore);
 
+                // Unlock input
+                isAnimating = false;
+
                 // Signal completion
                 if (onComplete) onComplete();
-            }, 400);
+            }, totalAnimationTime);
         }
 
         function getCellElement(row, col) {
@@ -1461,8 +2096,91 @@
         }
 
         function addScore(points) {
-            score += points;
-            scoreEl.textContent = score;
+            const startValue = score;
+            const endValue = score + points;
+            const oldLevel = Math.floor(startValue / LEVEL_THRESHOLD) + 1;
+            const newLevel = Math.floor(endValue / LEVEL_THRESHOLD) + 1;
+
+            score = endValue; // Update internal state immediately
+            animateScore(startValue, endValue, 500);
+
+            // Check for level up
+            if (newLevel > oldLevel) {
+                currentLevel = newLevel;
+                triggerLevelUp(newLevel);
+            }
+
+            // Update progress bar
+            updateProgressBar();
+        }
+
+        // Update level progress bar
+        function updateProgressBar() {
+            const levelTextEl = document.getElementById('level-text');
+            const levelBarFillEl = document.getElementById('level-bar-fill');
+
+            const currentXP = score % LEVEL_THRESHOLD;
+            const progressPercent = (currentXP / LEVEL_THRESHOLD) * 100;
+
+            levelTextEl.textContent = `Level ${currentLevel}`;
+            levelBarFillEl.style.width = `${progressPercent}%`;
+        }
+
+        // Trigger level-up celebration
+        function triggerLevelUp(level) {
+            const levelBarFillEl = document.getElementById('level-bar-fill');
+
+            // Flash the bar white
+            levelBarFillEl.classList.remove('level-up-flash');
+            void levelBarFillEl.offsetWidth; // Trigger reflow
+            levelBarFillEl.classList.add('level-up-flash');
+            setTimeout(() => levelBarFillEl.classList.remove('level-up-flash'), 600);
+
+            // Show level-up popup
+            const gridRect = gridEl.getBoundingClientRect();
+            const popup = document.createElement('div');
+            popup.className = 'level-up-popup';
+            popup.textContent = `Level ${level}!`;
+            popup.style.left = `${gridRect.left + gridRect.width / 2}px`;
+            popup.style.top = `${gridRect.top + gridRect.height / 2}px`;
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 1500);
+
+            // Haptic feedback for level up
+            triggerHaptic([25, 50, 25, 50, 50]);
+
+            // Placeholder for sound
+            if (typeof playLevelUpSound === 'function') playLevelUpSound();
+        }
+
+        // Placeholder level-up sound function
+        function playLevelUpSound() {
+            // Add audio implementation here if desired
+            console.log('Level Up Sound!');
+        }
+
+        // Rolling Score Ticker with ease-out effect
+        function animateScore(start, end, duration) {
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Ease-out cubic: 1 - (1 - t)^3
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+
+                const currentValue = Math.floor(start + (end - start) * easeOut);
+                scoreEl.textContent = currentValue;
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                } else {
+                    scoreEl.textContent = end; // Ensure final value is exact
+                }
+            }
+
+            requestAnimationFrame(update);
         }
 
         function showScorePopup(points) {
@@ -1475,6 +2193,79 @@
             document.body.appendChild(popup);
 
             setTimeout(() => popup.remove(), 800);
+        }
+
+        // ============================================
+        // PARTICLE EXPLOSION SYSTEM
+        // ============================================
+
+        function createExplosion(x, y, colorClass) {
+            const particleCount = 12 + Math.floor(Math.random() * 5); // 12-16 particles
+            const duration = 600 + Math.random() * 200; // 600-800ms
+            const gravity = 0.5;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = `explosion-particle ${colorClass}`;
+
+                // Random size (4-8px)
+                const size = 4 + Math.random() * 4;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+
+                // Varied shapes (circles, squares, triangles via clip-path)
+                const shapeType = Math.random();
+                if (shapeType < 0.4) {
+                    particle.style.borderRadius = '50%'; // Circle
+                } else if (shapeType < 0.7) {
+                    particle.style.borderRadius = `${Math.random() * 3}px`; // Rounded square
+                } else {
+                    particle.style.borderRadius = '0'; // Sharp square/debris
+                    particle.style.transform = `rotate(${Math.random() * 45}deg)`;
+                }
+
+                // Position at explosion center
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+
+                document.body.appendChild(particle);
+
+                // Physics: Random initial velocity
+                const angle = (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
+                const speed = 80 + Math.random() * 120; // pixels
+                const vx = Math.cos(angle) * speed;
+                const vy = Math.sin(angle) * speed - 60; // Upward bias
+
+                // Random rotation
+                const rotation = (Math.random() - 0.5) * 720; // ±360 degrees
+
+                // Calculate keyframes with gravity simulation
+                const keyframes = [];
+                const steps = 20;
+                for (let step = 0; step <= steps; step++) {
+                    const t = step / steps;
+                    const easeOut = 1 - Math.pow(1 - t, 2);
+
+                    // Position with gravity
+                    const px = vx * easeOut;
+                    const py = vy * easeOut + 0.5 * gravity * (duration * t) * (duration * t) / 1000;
+
+                    keyframes.push({
+                        transform: `translate(${px}px, ${py}px) rotate(${rotation * t}deg) scale(${1 - t * 0.5})`,
+                        opacity: 1 - t
+                    });
+                }
+
+                // Animate using Web Animations API
+                const animation = particle.animate(keyframes, {
+                    duration: duration,
+                    easing: 'ease-out',
+                    fill: 'forwards'
+                });
+
+                // Cleanup: Remove particle after animation
+                animation.onfinish = () => particle.remove();
+            }
         }
 
         // ============================================
@@ -1515,6 +2306,172 @@
         // ============================================
 
         preInit();
+        function showStreakPopup(streak) {
+            let tierText = "";
+            let tierColor = "#fff";
+            const streakColor = "#ff69b4"; // Pink
+
+            // Text Tiers
+            if (streak === 2) { tierText = "Nice!"; tierColor = "#69eb12"; }
+            else if (streak <= 4) { tierText = "Great!"; tierColor = "#00d2ff"; }
+            else { tierText = "UNSTOPPABLE!"; tierColor = "#ffd700"; }
+
+            const gridRect = gridEl.getBoundingClientRect();
+            const popup = document.createElement('div');
+            popup.className = 'streak-popup';
+
+            // Streak part follows pink color, tier text delayed by 25ms
+            popup.innerHTML = `<span style="color: ${streakColor}">${streak}x Streak!</span> <span id="streak-tier" style="color: ${tierColor}; opacity: 0; transition: opacity 0.1s;">${tierText}</span>`;
+
+            // Center roughly over grid
+            popup.style.left = `${gridRect.left + gridRect.width / 2}px`;
+            popup.style.top = `${gridRect.top + gridRect.height / 3}px`;
+            document.body.appendChild(popup);
+
+            // Delay for the combo/tier text
+            setTimeout(() => {
+                const tierEl = popup.querySelector('#streak-tier');
+                if (tierEl) tierEl.style.opacity = "1";
+            }, 25);
+
+            setTimeout(() => popup.remove(), 1000);
+        }
+
+        function triggerScreenShake(streak) {
+            const container = document.querySelector('.game-container');
+            container.classList.remove('shake-small', 'shake-medium', 'shake-large');
+            void container.offsetWidth; // trigger reflow
+
+            if (streak < 2) return; // No shake for streak 1
+
+            if (streak < 5) container.classList.add('shake-small');
+            else if (streak < 8) container.classList.add('shake-medium');
+            else container.classList.add('shake-large');
+
+            setTimeout(() => {
+                container.classList.remove('shake-small', 'shake-medium', 'shake-large');
+            }, 500);
+        }
+
+        // ============================================
+        // AMBIENT LIFE SYSTEM
+        // ============================================
+
+        let lastInteractionTime = Date.now();
+        let idleHintInterval = null;
+        let ambientSquishInterval = null;
+
+        // Reset interaction timer on any user input
+        function resetInteractionTimer() {
+            lastInteractionTime = Date.now();
+            clearIdleHints();
+        }
+
+        // Clear any active idle hints
+        function clearIdleHints() {
+            document.querySelectorAll('.idle-hint-cell').forEach(el => el.remove());
+        }
+
+        // Find a valid placement for any piece in hand
+        function findValidPlacement() {
+            for (let pieceIndex = 0; pieceIndex < hand.length; pieceIndex++) {
+                const piece = hand[pieceIndex];
+                if (!piece) continue;
+
+                for (let row = 0; row < GRID_SIZE; row++) {
+                    for (let col = 0; col < GRID_SIZE; col++) {
+                        if (canPlacePiece(piece, row, col)) {
+                            return { piece, pieceIndex, row, col };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Show ghost preview hint
+        function showIdleHint() {
+            if (isAnimating || draggedPiece) return;
+
+            clearIdleHints();
+            const placement = findValidPlacement();
+            if (!placement) return;
+
+            const { piece, row, col } = placement;
+            const gridRect = gridEl.getBoundingClientRect();
+            const cellStride = CELL_SIZE + 6;
+            const gridPadding = 10;
+
+            // Create ghost cells for each piece cell
+            piece.cells.forEach(([r, c]) => {
+                const targetRow = row + r;
+                const targetCol = col + c;
+
+                const ghost = document.createElement('div');
+                ghost.className = `idle-hint-cell color-${piece.color}`;
+                ghost.style.left = `${gridRect.left + gridPadding + targetCol * cellStride}px`;
+                ghost.style.top = `${gridRect.top + gridPadding + targetRow * cellStride}px`;
+                document.body.appendChild(ghost);
+
+                // Auto-remove after animation
+                setTimeout(() => ghost.remove(), 1500);
+            });
+        }
+
+        // Ambient squish - make random blocks "breathe"
+        function triggerAmbientSquish() {
+            if (isAnimating) return;
+
+            const filledCells = document.querySelectorAll('.cell.filled');
+            if (filledCells.length === 0) return;
+
+            // Select 2-3 random cells
+            const count = 2 + Math.floor(Math.random() * 2);
+            const indices = [];
+            while (indices.length < Math.min(count, filledCells.length)) {
+                const idx = Math.floor(Math.random() * filledCells.length);
+                if (!indices.includes(idx)) indices.push(idx);
+            }
+
+            indices.forEach(idx => {
+                const cell = filledCells[idx];
+                cell.classList.remove('squish');
+                void cell.offsetWidth; // Trigger reflow
+                cell.classList.add('squish');
+                setTimeout(() => cell.classList.remove('squish'), 300);
+            });
+        }
+
+        // Haptic feedback helper
+        function triggerHaptic(pattern) {
+            if (navigator.vibrate) {
+                navigator.vibrate(pattern);
+            }
+        }
+
+        // Start ambient life systems
+        function startAmbientLife() {
+            // Idle hint checker - every 1s, check if 5s inactive
+            idleHintInterval = setInterval(() => {
+                const idleTime = Date.now() - lastInteractionTime;
+                if (idleTime > 5000 && !draggedPiece && !isAnimating) {
+                    showIdleHint();
+                }
+            }, 3000); // Check and show hint every 3s when idle
+
+            // Ambient squish - every 2s
+            ambientSquishInterval = setInterval(triggerAmbientSquish, 2000);
+
+            // Track user interactions
+            document.addEventListener('mousemove', resetInteractionTimer);
+            document.addEventListener('mousedown', resetInteractionTimer);
+            document.addEventListener('touchstart', resetInteractionTimer);
+            document.addEventListener('keydown', resetInteractionTimer);
+        }
+
+        // Initialize ambient life after game starts
+        startAmbientLife();
+
         setupEventListeners(); // Attach inputs early so sticky/hover works if needed in future
     </script>
 </body>
